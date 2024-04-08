@@ -20,7 +20,7 @@ function serializeValue(value: any, type: string): string {
     return value.toString();
   }
 
-  if (['b', 'bool'].includes('type')) {
+  if (['b', 'bool'].includes(type)) {
     return value ? '1' : '0';
   }
 
@@ -123,6 +123,9 @@ export function eacnet(topName: string, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8
       const obj = await orig.apply(this, args);
       const xml =
         `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
+
+      console.log(xml);
+
       const kxml = to_bin(xml);
       const compressed = LZ77.compress(kxml.data);
       const result = Buffer.allocUnsafe(compressed.length + 0x2E);

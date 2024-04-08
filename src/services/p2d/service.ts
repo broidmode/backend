@@ -29,35 +29,6 @@ export class Service {
   }
 
   @eacnet('p2d')
-  async getServerValues() {
-    return {
-      status: v.s32(0),
-      error: v.s32(0),
-      result: {
-        bit_boost_magnification: v.str('2'),
-        debug_user_force_subscription: v.str('TRUE'),
-        devline_ignore_maintenance: v.str('TRUE'),
-        enable_file_upload: v.str('TRUE'),
-        frame_bit_magnification: v.str('TRUE'),
-        open_bemani_linkage_hinabita2023: v.str('TRUE'),
-        open_bemani_linkage_knst2024sp: v.str('TRUE'),
-        open_bemani_linkage_mixup: v.str('TRUE'),
-      }
-    }
-  }
-
-  @eacnet('p2d')
-  async checkGameVersion() {
-    return {
-      status: v.s32(0),
-      error: v.s32(0),
-      result: {
-        permission: v.s32(1),
-      }
-    };
-  }
-
-  @eacnet('p2d')
   async heartbeat(ctx: Context) {
     return {
       status: v.s32(0),
@@ -65,7 +36,7 @@ export class Service {
       result: {
         state: v.s32(1),
         next_clock: v.u64(new Date().valueOf() + 36e5),
-        token: ctx.token,
+        token: v.str(ctx.token),
         time_remain: v.s32(0x7fffffff),
         subscription_status: v.s32(1),
       }
