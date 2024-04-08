@@ -1,14 +1,20 @@
 import { Context } from '../types.js';
-import { kxml } from '../decorators/to-kxml.js';
+import { eacnet } from '../decorators/eacnet.js';
+import { v } from '../utils/kxml-value.js';
 
 export class DefaultService {
-  @kxml()
   async default(ctx: Context) {
-    return {
-      [ctx.service.name]: {
-        $method: ctx.service.method,
-        status: '0',
-      }
-    }
+    const descriptor = {
+      value: () => ({
+        status: v.s32(0),
+        error: v.s32(0),
+        result: {
+          dummy: v.u8(0),
+        }
+      })
+    };
+
+    eacnet(ctx.service.name)(undefined, undefined, descriptor);
+    return descriptor.value();
   }
 }

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { to_bin } from '@kamyu/kbinxml';
+import { LZ77 } from '../utils/lz77.js';
 
 function serializeValue(value: any, type: string): string {
   if (
@@ -115,7 +116,7 @@ function serializeObject(obj: Object, name: string, linePrefix: string = '') {
   return output + `</${name}>\n`;
 }
 
-export function kxml(topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): MethodDecorator {
+export function eacnet(topName: string, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): MethodDecorator {
   return function (_target, _propertyKey, descriptor) {
     const orig = descriptor.value as Function;
     descriptor.value = async function (...args: any[]) {
@@ -123,24 +124,14 @@ export function kxml(topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JI
       const xml =
         `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
       const kxml = to_bin(xml);
+      const compressed = LZ77.compress(kxml.data);
+      const result = Buffer.allocUnsafe(compressed.length + 0x2E);
 
-      return Buffer.from(kxml.data);
+      result.write('P2D:2015091800', 0, 'ascii');
+      result.set(compressed, 0x2E);
+
+      return result;
     } as unknown as any;
-  }
-}
-
-export function serviceKxml(service: string, topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): (method: string) => MethodDecorator {
-  return function (method: string) {
-    const toKxml = kxml(topName, encoding);
-    return function (_target, _propertyKey, descriptor) {
-      const orig = descriptor.value as Function;
-      descriptor.value = async function (...args: any[]) {
-        const obj = await orig.apply(this, args);
-        return { [service]: { method, ...obj } };
-      } as unknown as any;
-
-      toKxml(_target, _propertyKey, descriptor);
-    }
   }
 }
 

@@ -1,15 +1,13 @@
 import 'reflect-metadata';
 
 import Koa, { DefaultState } from 'koa';
+import bodyParser from 'koa-bodyparser';
 import { InjectionToken, Provider, container } from 'tsyringe';
 
 import { ILaochanContext } from './types.js';
 import { DefaultService } from './services/default.js';
 import { Logger } from '@cordisjs/logger';
-import { crypto } from './middlewares/crypto.js';
-import { binaryBody } from './middlewares/binarybody.js';
-import { parseKxml } from './middlewares/parseKxml.js';
-import { decompress } from './middlewares/decompress.js';
+import { eacnet } from './middlewares/eacnet.js';
 import config from './utils/config.js';
 import { MongoClient, Db } from 'mongodb';
 
@@ -30,7 +28,7 @@ function register<T>(
 }
 
 async function main(): Promise<void> {
-  const logger = new Logger('laochan-net');
+  const logger = new Logger('laochan-eacnet');
 
   logger.info('initialization...');
 
@@ -59,38 +57,22 @@ async function main(): Promise<void> {
         ctx.body = `${e.stack ?? 'Internal Error'}`;
       }
     })
-    .use(binaryBody)
-    .use(crypto)
-    .use(decompress)
-    .use(parseKxml)
+    .use(bodyParser({
+      formLimit: '1mb',
+    }))
+    .use(eacnet)
     .use(async (ctx, next) => {
-      if (typeof ctx.query.f !== 'string') {
+      if (!ctx.service) {
         throw new Error('invaild service');
       }
 
-      if (typeof ctx.query.model !== 'string') {
-        throw new Error('invaild model');
-      }
-
-      // eslint-disable-next-line prefer-const
-      let [serviceName, method] = ctx.query.f.split('.');
-
-      ctx.model = ctx.query.model;
-      ctx.service = {
-        name: serviceName,
-        method,
-      };
-
-      ctx.body = ctx.body[ctx.service.name];
       ctx.logger = ctx.service
-        ? register(`logger:${ctx.service.name}`, {
-          useValue: new Logger(ctx.service.name),
+        ? register(`logger:${ctx.service.name}:${ctx.service.method}`, {
+          useValue: new Logger(`${ctx.service.name}:${ctx.service.method}`),
         })
         : logger;
 
-      let service: object | undefined = ctx.service
-        ? tryResolve(ctx.service.name)
-        : container.resolve(DefaultService);
+      let service: object | undefined = tryResolve(ctx.service.name);
 
       if (service === undefined) {
         try {
@@ -100,43 +82,53 @@ async function main(): Promise<void> {
             module = await import(
               `./services/${ctx.service.name}/index.js`
             );
-          } catch {
-            module = await import(
-              `./services/${ctx.service.name}.js`
-            );
+          } catch (e) {
+            if (e.code != 'ERR_MODULE_NOT_FOUND') {
+              logger.error(
+                `load service error %s`,
+                JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
+              );
+            } else {
+              module = await import(
+                `./services/${ctx.service.name}.js`
+              );
+            }
           }
 
           service = register(ctx.service.name, {
             useClass: module.default,
-
           });
         } catch (e) {
-          logger.error(
-            `load service error %s`,
-            JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
-          );
+          if (e.code != 'ERR_MODULE_NOT_FOUND') {
+            logger.error(
+              `load service error %s`,
+              JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
+            );
+          }
         }
       }
 
       logger.info(
-        '%s.$s [%s]: request = %s',
+        '%s.%s [%s]: request = %s',
         ctx.service.name,
         ctx.service.method,
-        ctx.pcbid,
-        JSON.stringify(ctx.request.body),
+        ctx.token,
+        JSON.stringify(ctx.body),
       );
 
-      if (service === undefined || !(method in service)) {
-        logger.warn(`unimplemented method ${ctx.service.method} in ${ctx.service.name}`);
+      let method = ctx.service.method;
+
+      if (!service || !(service[method])?.bind) {
+        logger.warn(`unimplemented method ${method} in ${ctx.service.name}`);
 
         service = container.resolve(DefaultService);
         method = 'default';
       }
 
-      ctx.body = await service[method](ctx);
+      ctx.body = await (service[method] as Function).bind(service)(ctx);
       ctx.status = 200;
 
-      logger.info('%s [server]: status = %d', ctx.service, ctx.status);
+      logger.info('%s.%s [server]: status = %d', ctx.service.name, ctx.service.method, ctx.status);
       return await next();
     });
 

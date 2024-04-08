@@ -1,5 +1,6 @@
 import { Next } from 'koa';
 import { Context } from '../types.js';
+import { LZ77 } from '../utils/lz77.js';
 import { to_xml } from '@kamyu/kbinxml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -83,26 +84,43 @@ function kxmlToObject(node: Record<string, unknown>): any {
   return obj;
 }
 
-export async function parseKxml(ctx: Context, next: Next): Promise<object> {
-  if (!(ctx.request.body instanceof Buffer)) {
+export async function eacnet(ctx: Context, next: Next): Promise<any> {
+  const body = ctx.request.body as {
+    request: string;
+    p2d_token: string;
+  } | undefined;
+
+  if (!body || !body.request) {
     return next();
   }
 
-  if ('x-dev' in ctx.request.headers) {
-    ctx.request.body = JSON.parse(ctx.request.body.toString('utf-8'));
+  const { request, p2d_token: token } = body;
+  const buffer = Buffer.from(request
+    .replaceAll(' ', '+')
+    .replaceAll('-', '+')
+    .replaceAll('_', '/') + '===',
+    'base64'
+  );
+  const decoded = LZ77.decompress(buffer);
+  const xmlResult = kxmlToObject(parser.parse(to_xml(decoded).data));
+
+  const game = Object.keys(xmlResult)[0];
+
+  if (!(game in xmlResult)) {
+    return next();
+  }
+
+  if(xmlResult[game].params) {
+    ctx.body = xmlResult.p2d.params;
   } else {
-    const xmlResult = to_xml(ctx.request.body);
-    ctx.request.body = kxmlToObject(parser.parse(xmlResult.data));
+    ctx.body = {};
   }
 
-  const body = ctx.request.body as any;
-
-  if ('call' in body) {
-    ctx.pcbid = body.call.srcid;
-    ctx.tag = body.call.tag;
-
-    ctx.body = body.call;
+  ctx.service = {
+    name: game,
+    method: xmlResult[game].method,
   }
 
+  ctx.token = token;
   return next();
 }

@@ -3,11 +3,11 @@ dotenv.config();
 
 class Config {
   get port() {
-    return process.env.PORT ? parseInt(process.env.PORT) : 10573;
+    return process.env.PORT ? parseInt(process.env.PORT) : 25730;
   }
 
   get selfUrl() {
-    return process.env.SELF_URL ?? 'http://127.0.0.1:10573';
+    return process.env.SELF_URL ?? 'http://localhost:25730';
   }
 
   get ntpUrl() {
@@ -15,11 +15,11 @@ class Config {
   }
 
   get mongoUrl() {
-    return process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017';
+    return process.env.MONGO_URL ?? 'mongodb://localhost:27017';
   }
 
   get dbName() {
-    return process.env.DB_NAME ?? 'laochan-net';
+    return process.env.DB_NAME ?? 'laochan-eacnet';
   }
 
   get isDev() {

@@ -1,37 +1,64 @@
-export function lz77Decode(data: Buffer): Buffer {
-  let offset = 0;
-  const output: number[] = [];
-
-  while (offset < data.length) {
-    const flag = data[offset];
-    offset += 1;
-
-    for (let bit = 0; bit < 8; bit++) {
-      if (flag & (1 << bit)) {
-        output.push(data[offset]);
-        offset += 1;
-      } else {
-        if (offset >= data.length) break;
-
-        const lookbackFlag = data.readUInt16BE(offset);
-        const lookbackLength = (lookbackFlag & 0x000f) + 3;
-        const lookbackOffset = lookbackFlag >> 4;
-
-        offset += 2;
-        if (lookbackFlag == 0) break;
-
-        for (let i = 0; i < lookbackLength; i++) {
-          const loffset = output.length - lookbackOffset;
-
-          if (loffset <= 0 || loffset >= output.length) {
-            output.push(0);
-          } else {
-            output.push(output[loffset]);
-          }
+export class LZ77 {
+  static compress(input: ArrayLike<number>) {
+    const a = Uint8Array.from(input);
+    const res = new Uint8Array(a.length + a.length / 8 + 3);
+    let p = 0;
+    for (let i = 0; i < a.length; ++i) {
+      if (i % 8 === 0) {
+        if (a.length - i < 8) {
+          res[p] = (Math.pow(2, a.length - i) - 1);
+        } else {
+          res[p] = 255;
         }
+        p++;
       }
+      res[p] = a[i];
+      p++;
     }
+    res[p] = 0;
+    res[p + 1] = 0;
+
+    return Buffer.from(res);
   }
 
-  return Buffer.from(output);
+  static decompress(a: ArrayLike<number>) {
+    const res = new Uint8Array(0x190000);
+    let p = 0;
+    let r = 0;
+    let t = 0;
+    let b = 8;
+    let mask = 0;
+
+    while (true) {
+      if (b === 8) {
+        mask = a[p];
+        p++;
+        b = 0;
+      }
+      if ((mask & 1) === 1) {
+        res[r] = a[p];
+        r++;
+        p++;
+      } else {
+        let distance = a[p];
+        let count = a[p + 1];
+        if (distance === 0 && count === 0) break;
+        p += 2;
+        distance <<= 4;
+        distance |= count >> 4;
+        count = (count & 0x0F) + 3;
+        t = r - distance;
+        for (let i = 0; i < count; ++i) {
+          res[r] = t < 0 ? 0x00 : res[t];
+          r++;
+          t++;
+        }
+      }
+      mask >>= 1;
+      b += 1;
+    }
+
+    const o = res.slice(0, r);
+    return Buffer.from(o);
+  }
 }

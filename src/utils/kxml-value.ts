@@ -27,7 +27,7 @@ function vg(type: ValueTypes) {
       }
     }
 
-    return attrs;
+    return result;
   };
 }
 

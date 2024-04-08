@@ -2,9 +2,7 @@ import { Logger } from '@cordisjs/logger';
 import { DefaultState, ParameterizedContext } from 'koa';
 
 export interface ILaochanContext {
-  model?: string;
-  tag?: string;
-  pcbid?: string;
+  token?: string;
 
   service: {
     name: string,
@@ -12,10 +10,7 @@ export interface ILaochanContext {
   };
 
   logger: Logger;
-
-  request: {
-    body: Buffer | object | undefined;
-  };
+  body?: unknown;
 }
 
 export type Context = ParameterizedContext<DefaultState, ILaochanContext, any>;
