@@ -3,7 +3,8 @@ import { eacnet } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { ITEM_LIST, MUSIC_LIST } from "./index.js";
-import { PlayerMusicData, PlayerPlayData } from "../../database/index.js";
+import { PlayerMusicData, PlayerPlayData, PlayerPlayLog } from "../../database/index.js";
+import { fromToken } from "../../utils/laochan-id.js";
 
 export class User {
   db: Db;
@@ -12,8 +13,12 @@ export class User {
     return this.db.collection<PlayerPlayData>('player_play_data');
   }
 
-  get playMusicCol() {
+  get musicDataCol() {
     return this.db.collection<PlayerMusicData>('player_music_data');
+  }
+
+  get playLogCol() {
+    return this.db.collection<PlayerPlayLog>('player_play_log');
   }
 
   @eacnet('p2d')
@@ -58,7 +63,11 @@ export class User {
       status: v.s32(0),
       error: v.s32(0),
       result: {
-        point_count: v.s32(114514),
+        point_count: v.s32(1),
+        point: [{
+          point_id: v.str('P0100000'),
+          point_num: v.u32(114514),
+        }]
       }
     }
   }
@@ -86,15 +95,78 @@ export class User {
   }
 
   @eacnet('p2d')
+  async reportMusicResult(ctx: Context) {
+    const result = ctx.body as PlayerPlayLog;
+    result.player = ctx.token;
+
+    let updateTask = Promise.resolve();
+
+    const play_style = Math.floor(result.note_id / 5);
+    const diff = result.note_id % 5;
+
+    updateTask = (async () => {
+      const musicData = (await this.musicDataCol.findOne({
+        player: result.player,
+        music_id: result.music_id,
+        play_style: play_style
+      })) ?? {
+        player: result.player,
+        music_id: result.music_id,
+        play_style: play_style,
+
+        score: [0, 0, 0, 0, 0],
+        clear_flag: [0, 0, 0, 0, 0],
+        miss_count: [0, 0, 0, 0, 0],
+        play_num: [0, 0, 0, 0, 0],
+        clear_num: [0, 0, 0, 0, 0],
+      };
+
+      if (result.clear_flag > musicData.clear_flag[diff])
+        musicData.clear_flag[diff] = result.clear_flag;
+
+      if (result.miss_count < musicData.miss_count[diff])
+        musicData.miss_count[diff] = result.miss_count;
+
+      if (result.score > musicData.score[diff])
+        musicData.score[diff] = result.score;
+
+      if (result.clear_flag >= 2)
+        musicData.clear_num[diff]++;
+
+      musicData.play_num[diff]++;
+
+      await this.musicDataCol.updateOne({
+        player: result.player,
+        music_id: result.music_id,
+        play_style: play_style
+      }, {
+        $set: musicData
+      }, {
+        upsert: true
+      });
+    })();
+
+    await Promise.all([
+      this.playLogCol.insertOne(result),
+      updateTask,
+    ])
+
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    };
+  }
+
+  @eacnet('p2d')
   async savePlayData(ctx: Context) {
     const uid = ctx.token;
-    const { pdata, checksum } = ctx.body as { pdata: Buffer, checksum: string };
+    const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
 
     await this.playDataCol
       .updateOne({ _id: uid }, {
         $set: {
           pdata: new Binary(pdata),
-          checksum: checksum,
+          check_sum,
         }
       });
 
@@ -122,6 +194,9 @@ export class User {
       status: v.s32(0),
       error: v.s32(0),
       result: {
+        size: v.s32(result.pdata.length()),
+        rest_size: v.s32(0),
+        check_sum: v.str(result.check_sum),
         pdata: v.bin(result.pdata.buffer),
       }
     }
@@ -130,17 +205,62 @@ export class User {
   @eacnet('p2d')
   async registPlayer(ctx: Context) {
     const uid = ctx.token;
-    const { pdata, checksum } = ctx.body as { pdata: Buffer, checksum: string };
+    const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
 
     await this.playDataCol
-      .insertOne({ _id: uid, pdata: new Binary(pdata), checksum });
-
-    // this.userDataSaveTemp.set(uid, { pdata, checksum });
+      .insertOne({ _id: uid, pdata: new Binary(pdata), check_sum });
 
     return {
       status: v.s32(0),
       error: v.s32(0),
     }
+  }
+
+  @eacnet('p2d')
+  async checkPlayData(ctx: Context) {
+    const { check_sum } = ctx.body as { check_sum: string };
+
+    const data = await this.playDataCol.findOne({ _id: ctx.token }, {
+      projection: {
+        check_sum: 1,
+      }
+    });
+
+    const id = fromToken(ctx.token);
+
+    if (!data) {
+      return {
+        status: v.s32(0),
+        error: v.s32(0),
+        result: {
+          infinitas_id: v.str(id),
+          valid: v.bool(false),
+          is_exist: v.bool(false),
+        }
+      };
+    }
+
+    if (data.check_sum !== check_sum) {
+      return {
+        status: v.s32(0),
+        error: v.s32(0),
+        result: {
+          infinitas_id: v.str(id),
+          valid: v.bool(false),
+          is_exist: v.bool(true),
+        }
+      };
+    }
+
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+      result: {
+        infinitas_id: v.str(id),
+        valid: v.bool(true),
+        is_exist: v.bool(true),
+      }
+    };
   }
 
   @eacnet('p2d')
@@ -163,7 +283,7 @@ export class User {
       error: v.s32(0),
       result: {
         status: v.s32(0),
-        check_sum: v.str('f57959c468c9c59c47a4cead973f59fbec72eaa53a790c5b792222148e69c19d'),
+        check_sum: v.str('adb004981ab29df534ef1d8b5e6216b447042f798010c2c1f233eebc058e1b67'),
         music_list: {
           music_num: v.s32(MUSIC_LIST.length),
           music: MUSIC_LIST,
@@ -185,36 +305,26 @@ export class User {
   async getMusicData(ctx: Context) {
     const { play_style } = ctx.body as { play_style: number };
 
+    const musicDatas = await this.musicDataCol.find({
+      player: ctx.token,
+      play_style,
+    }).toArray();
+
     return {
       status: v.s32(0),
       error: v.s32(0),
       play_style: v.s32(play_style),
       result: {
-        music: MUSIC_LIST.map(music => ({
-          music_id: music.music_id,
-          score: v.s32([9999, 9999, 9999, 9999]),
-          clear_flag: v.s32([7, 7, 7, 7]),
-          miss_count: v.s32([0, 0, 0, 0]),
-          play_num: v.s32([1, 1, 1 ,1]),
-          clear_num: v.s32([1, 1, 1 ,1]),
+        music: musicDatas.map(data => ({
+          music_id: v.s32(data.music_id),
+          score: v.s32(data.score),
+          clear_flag: v.s32(data.clear_flag),
+          miss_count: v.s32(data.miss_count),
+          play_num: v.s32(data.play_num),
+          clear_num: v.s32(data.clear_num),
         }))
       },
     }
-  }
-
-  @eacnet('p2d')
-  async checkPlayData(ctx: Context) {
-    const count = await this.playDataCol.countDocuments({ _id: ctx.token });
-
-    return {
-      status: v.s32(0),
-      error: v.s32(0),
-      result: {
-        infinitas_id: v.str(ctx.token),
-        valid: v.bool(count),
-        is_exist: v.bool(count),
-      }
-    };
   }
 
   @eacnet('p2d')

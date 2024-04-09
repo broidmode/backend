@@ -1,72 +1,53 @@
-import { Binary } from "mongodb";
-
-export interface PlayerInfo {
-  _id: string;
-  rivals: string[];
-  pointCount: number;
-  customize: {
-    2: string;
-    3: string;
-    4: string;
-    5: string;
-    6: string;
-    7: string;
-    8: string;
-    11: string;
-    10: string;
-  },
-  otherCustomize: {
-    1: string;
-    2: string;
-    3: string;
-    4: string;
-    5: string;
-  }
-}
+import { Binary, ObjectId } from "mongodb";
 
 export interface PlayerPlayData {
   _id: string;
+  // konami binary xml
   pdata: Binary;
-  checksum: string;
+  // sha256 to ^
+  check_sum: string;
 }
 
 export interface PlayerMusicData {
   player: string;
-  musicId: string;
-  clearFlag: {
-    spb: number;
-    spn: number;
-    sph: number;
-    spa: number;
-    spl: number;
-    dpb: number;
-    dpn: number;
-    dph: number;
-    dpa: number;
-    dpl: number;
-  };
-  score: {
-    spb: number;
-    spn: number;
-    sph: number;
-    spa: number;
-    spl: number;
-    dpb: number;
-    dpn: number;
-    dph: number;
-    dpa: number;
-    dpl: number;
-  };
-  missCount: {
-    spb: number;
-    spn: number;
-    sph: number;
-    spa: number;
-    spl: number;
-    dpb: number;
-    dpn: number;
-    dph: number;
-    dpa: number;
-    dpl: number;
-  };
+  music_id: number;
+  play_style: number;
+
+  // 1 = B, 5 = L, etc
+  score: number[];
+  clear_flag: number[];
+  miss_count: number[];
+  play_num: number[];
+  clear_num: number[];
 }
+
+export interface PlayerPlayLog {
+  _id: ObjectId,
+  player: string;
+  clock: number,
+  music_id: number,
+  note_id: number,
+  score: number,
+  pgreat_count: number,
+  great_count: number,
+  miss_count: number,
+  clear_flag: number,
+  stage: number,
+  groove_gauge: number,
+  mode_id: number,
+  mode_sub_id: number,
+  fail_detail: number,
+  ghost_check_sum: string,
+  update_my_best_score: boolean,
+  is_limit_score: boolean,
+  rival_infinitas_id: string,
+  is_compe: boolean,
+  compe_id: number,
+  compe_music_index: number
+  valid_best_option: boolean,
+  arrange_0: number,
+  arrange_1: number,
+  assist: number,
+  flip: number,
+  ghost: Buffer,
+};

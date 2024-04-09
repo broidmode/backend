@@ -6,10 +6,15 @@ import { XMLParser } from 'fast-xml-parser';
 
 const parser = new XMLParser({
   ignoreAttributes: false,
-  parseAttributeValue: true,
+  parseAttributeValue: false,
   attributeNamePrefix: '$',
   removeNSPrefix: true,
-  allowBooleanAttributes: true,
+  numberParseOptions: {
+    hex: false,
+    leadingZeros: false,
+    eNotation: false,
+    skipLike: /.*/,
+  },
 });
 
 function parseValue(node: { $__type: string; $__count?: unknown }): any {
@@ -25,15 +30,21 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
       'u32',
       's64',
       'u64',
-      'float',
-      'double',
     ].includes(node.$__type)
   ) {
     if (isArray) {
-      return node['#text'].split(' ').map((v) => new Number(v));
+      return node['#text'].split(' ').map((v) => parseInt(v));
     }
 
-    return new Number(node['#text']);
+    return parseInt(node['#text']);
+  }
+
+  if (['float', 'double'].includes(node.$__type)) {
+    if (isArray) {
+      return node['#text'].split(' ').map((v) => parseFloat(v));
+    }
+
+    return parseFloat(node['#text']);
   }
 
   if (['b', 'bool'].includes(node.$__type)) {
@@ -106,7 +117,9 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
     'base64'
   );
   const decoded = LZ77.decompress(buffer);
-  const xmlResult = kxmlToObject(parser.parse(to_xml(decoded).data));
+  const xml = to_xml(decoded).data;
+  const parsedXml = parser.parse(xml);
+  const xmlResult = kxmlToObject(parsedXml);
 
   const game = Object.keys(xmlResult)[0];
 

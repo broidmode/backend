@@ -109,11 +109,12 @@ async function main(): Promise<void> {
       }
 
       logger.info(
-        '%s.%s [%s]: request = %s',
+        '%s %s.%s [%s]: request = %o',
+        ctx.url,
         ctx.service.name,
         ctx.service.method,
         ctx.token,
-        JSON.stringify(ctx.body),
+        ctx.body,
       );
 
       let method = ctx.service.method;

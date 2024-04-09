@@ -16,7 +16,7 @@ function Combine(...modules: ({ new(): any })[]) {
   modules.forEach(v => {
     const descriptors = Object.getOwnPropertyDescriptors(v.prototype);
 
-    for(const name in descriptors) {
+    for (const name in descriptors) {
       if (name === 'constructor')
         continue;
 
@@ -40,9 +40,17 @@ export default class extends Combine(Service, User, Game) {
 }
 
 export const ITEM_LIST = data.items;
-export const MUSIC_LIST = data.musics.map(id => ({
-  music_id: v.s32(id),
-  kind: v.s32(1),
-  note_bit: v.s32(0),
-  music_pack_item_id: v.str('')
-}));
+export const MUSIC_LIST = [
+  ...data.musics.map(id => ({
+    music_id: v.s32(id),
+    kind: v.s32(1),
+    note_bit: v.s32(0),
+    music_pack_item_id: v.str('')
+  })),
+  ...data.lmusics.map(id => ({
+    music_id: v.s32(id),
+    kind: v.s32(2),
+    note_bit: v.s32(1),
+    music_pack_item_id: v.str('')
+  })),
+];
