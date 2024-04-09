@@ -5,6 +5,14 @@ import { v } from '../../utils/kxml-value.js';
 
 export class Service {
   @eacnet('p2d')
+  async sendLog() {
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    };
+  }
+
+  @eacnet('p2d')
   async getServerState() {
     return {
       status: v.s32(0),
@@ -168,7 +176,7 @@ export class Service {
           {
             service_name: v.str(`getDownloadResource`),
             url: v.str(
-              'https://d1rc4pwxnc0pe0.cloudfront.net/v2/resource/distribution/ondemand',
+              'https://d1rc4pwxnc0pe0.cloudfront.net/',
             ),
           },
           {

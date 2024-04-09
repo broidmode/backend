@@ -1,10 +1,20 @@
+import { Binary, Db } from "mongodb";
 import { eacnet } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
-import { MUSIC_LIST } from "./index.js";
+import { ITEM_LIST, MUSIC_LIST } from "./index.js";
+import { PlayerMusicData, PlayerPlayData } from "../../database/index.js";
 
 export class User {
-  userDataSaveTemp = new Map<string, { pdata: Buffer, checksum: string }>();
+  db: Db;
+
+  get playDataCol() {
+    return this.db.collection<PlayerPlayData>('player_play_data');
+  }
+
+  get playMusicCol() {
+    return this.db.collection<PlayerMusicData>('player_music_data');
+  }
 
   @eacnet('p2d')
   async getCustomizeSetting() {
@@ -12,8 +22,24 @@ export class User {
       status: v.s32(0),
       error: v.s32(0),
       result: {
-        customize: [{ item_category: v.s32(2), item_id: v.str('I1100000') }, { item_category: v.s32(3), item_id: v.str('I1200000') }, { item_category: v.s32(4), item_id: v.str('I1300000') }, { item_category: v.s32(5), item_id: v.str('I1400000') }, { item_category: v.s32(6), item_id: v.str('I1500000') }, { item_category: v.s32(7), item_id: v.str('I1600000') }, { item_category: v.s32(8), item_id: v.str('I1700000') }, { item_category: v.s32(11), item_id: v.str('I1300000') }, { item_category: v.s32(10), item_id: v.str('I1900000') }],
-        other_customize: [{ item_category: v.s32(1), item_id: v.str('C1000000') }, { item_category: v.s32(2), item_id: v.str('C1100000') }, { item_category: v.s32(3), item_id: v.str('C1200000') }, { item_category: v.s32(4), item_id: v.str('C1300000') }, { item_category: v.s32(5), item_id: v.str('C1400000') },],
+        customize: [
+          { item_category: v.s32(2), item_id: v.str('I1100000') },
+          { item_category: v.s32(3), item_id: v.str('I1200000') },
+          { item_category: v.s32(4), item_id: v.str('I1300000') },
+          { item_category: v.s32(5), item_id: v.str('I1400000') },
+          { item_category: v.s32(6), item_id: v.str('I1500000') },
+          { item_category: v.s32(7), item_id: v.str('I1600000') },
+          { item_category: v.s32(8), item_id: v.str('I1700000') },
+          { item_category: v.s32(11), item_id: v.str('I1300000') },
+          { item_category: v.s32(10), item_id: v.str('I1900000') }
+        ],
+        other_customize: [
+          { item_category: v.s32(1), item_id: v.str('C1000000') },
+          { item_category: v.s32(2), item_id: v.str('C1100000') },
+          { item_category: v.s32(3), item_id: v.str('C1200000') },
+          { item_category: v.s32(4), item_id: v.str('C1300000') },
+          { item_category: v.s32(5), item_id: v.str('C1400000') }
+        ],
       }
     }
   }
@@ -64,7 +90,13 @@ export class User {
     const uid = ctx.token;
     const { pdata, checksum } = ctx.body as { pdata: Buffer, checksum: string };
 
-    this.userDataSaveTemp.set(uid, { pdata, checksum });
+    await this.playDataCol
+      .updateOne({ _id: uid }, {
+        $set: {
+          pdata: new Binary(pdata),
+          checksum: checksum,
+        }
+      });
 
     return {
       status: v.s32(0),
@@ -76,20 +108,21 @@ export class User {
   async getPlayData(ctx: Context) {
     const uid = ctx.token;
 
-    if (!this.userDataSaveTemp.has(uid)) {
+    const result = await this.playDataCol
+      .findOne({ _id: uid });
+
+    if (!result) {
       return {
         status: v.s32(1),
         error: v.s32(404),
       }
     }
 
-    const { pdata } = this.userDataSaveTemp.get(uid);
-
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
-        pdata: v.bin(pdata),
+        pdata: v.bin(result.pdata.buffer),
       }
     }
   }
@@ -99,7 +132,10 @@ export class User {
     const uid = ctx.token;
     const { pdata, checksum } = ctx.body as { pdata: Buffer, checksum: string };
 
-    this.userDataSaveTemp.set(uid, { pdata, checksum });
+    await this.playDataCol
+      .insertOne({ _id: uid, pdata: new Binary(pdata), checksum });
+
+    // this.userDataSaveTemp.set(uid, { pdata, checksum });
 
     return {
       status: v.s32(0),
@@ -112,7 +148,11 @@ export class User {
     return {
       status: v.s32(0),
       error: v.s32(0),
-      result: {},
+      result: {
+        rival_data: [{
+
+        }]
+      },
     }
   }
 
@@ -123,7 +163,7 @@ export class User {
       error: v.s32(0),
       result: {
         status: v.s32(0),
-        check_sum: v.str('d4980d5c3436638d4802314993e66a1790075e13022b36979b081c494536d6aa'),
+        check_sum: v.str('f57959c468c9c59c47a4cead973f59fbec72eaa53a790c5b792222148e69c19d'),
         music_list: {
           music_num: v.s32(MUSIC_LIST.length),
           music: MUSIC_LIST,
@@ -149,21 +189,30 @@ export class User {
       status: v.s32(0),
       error: v.s32(0),
       play_style: v.s32(play_style),
-      result: {},
+      result: {
+        music: MUSIC_LIST.map(music => ({
+          music_id: music.music_id,
+          score: v.s32([9999, 9999, 9999, 9999]),
+          clear_flag: v.s32([7, 7, 7, 7]),
+          miss_count: v.s32([0, 0, 0, 0]),
+          play_num: v.s32([1, 1, 1 ,1]),
+          clear_num: v.s32([1, 1, 1 ,1]),
+        }))
+      },
     }
   }
 
   @eacnet('p2d')
   async checkPlayData(ctx: Context) {
-    const exists = this.userDataSaveTemp.has(ctx.token)
+    const count = await this.playDataCol.countDocuments({ _id: ctx.token });
 
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
         infinitas_id: v.str(ctx.token),
-        valid: v.bool(exists),
-        is_exist: v.bool(exists),
+        valid: v.bool(count),
+        is_exist: v.bool(count),
       }
     };
   }
@@ -175,16 +224,12 @@ export class User {
       error: v.s32(0),
       result: {
         item_list: {
-          item_num: v.s32(2),
-          item: [{
-            item_id: v.str('I1000000'),
-            not_free_count: v.s32(0),
+          item_num: v.s32(ITEM_LIST.length),
+          item: ITEM_LIST.map(id => ({
+            item_id: v.str(id),
+            not_free_count: v.s32(1000),
             free_count: v.s32(1000),
-          }, {
-            item_id: v.str('I1000001'),
-            not_free_count: v.s32(0),
-            free_count: v.s32(1000),
-          }]
+          }))
         }
       }
     };

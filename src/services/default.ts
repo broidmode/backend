@@ -1,7 +1,9 @@
 import { Context } from '../types.js';
 import { eacnet } from '../decorators/eacnet.js';
 import { v } from '../utils/kxml-value.js';
+import { singleton } from 'tsyringe';
 
+@singleton()
 export class DefaultService {
   async default(ctx: Context) {
     const descriptor = {

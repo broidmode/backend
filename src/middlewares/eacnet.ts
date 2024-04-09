@@ -58,9 +58,13 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
   };
 }
 
-function kxmlToObject(node: Record<string, unknown>): any {
+function kxmlToObject(node: Record<string, unknown> | unknown[] | string): any {
   if (node instanceof Array) {
-    return node.map((v) => kxmlToObject(v));
+    return node.map((v) => kxmlToObject(v as Record<string, unknown>));
+  }
+
+  if (typeof node === 'string') {
+    return {};
   }
 
   if ('$__type' in node) {
@@ -110,7 +114,7 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
     return next();
   }
 
-  if(xmlResult[game].params) {
+  if (xmlResult[game].params) {
     ctx.body = xmlResult.p2d.params;
   } else {
     ctx.body = {};
