@@ -109,12 +109,18 @@ async function main(): Promise<void> {
       }
 
       logger.info(
-        '%s %s.%s [%s]: request = %o',
+        '%s %s.%s [%s]: request = %s',
         ctx.url,
         ctx.service.name,
         ctx.service.method,
         ctx.token,
-        ctx.body,
+        JSON.stringify(ctx.body, (key, value) => {
+          if (key === 'pdata') {
+            return '<PDATA>';
+          }
+
+          return value;
+        }),
       );
 
       let method = ctx.service.method;

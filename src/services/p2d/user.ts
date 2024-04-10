@@ -22,6 +22,22 @@ export class User {
   }
 
   @eacnet('p2d')
+  async consumeItem() {
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    };
+  }
+
+  @eacnet('p2d')
+  async reserveConsumeItem() {
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    };
+  }
+
+  @eacnet('p2d')
   async getCustomizeSetting() {
     return {
       status: v.s32(0),
@@ -283,7 +299,7 @@ export class User {
       error: v.s32(0),
       result: {
         status: v.s32(0),
-        check_sum: v.str('adb004981ab29df534ef1d8b5e6216b447042f798010c2c1f233eebc058e1b67'),
+        check_sum: v.str('2e49eba0b6ca8b6898f5d684ea0c3bc1ed6f1d572a4d308cf32727d64069a588'),
         music_list: {
           music_num: v.s32(MUSIC_LIST.length),
           music: MUSIC_LIST,
