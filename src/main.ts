@@ -63,7 +63,7 @@ async function main(): Promise<void> {
     .use(eacnet)
     .use(async (ctx, next) => {
       if (!ctx.service) {
-        throw new Error('invaild service');
+        return await next();
       }
 
       ctx.logger = ctx.service
@@ -136,7 +136,10 @@ async function main(): Promise<void> {
       ctx.status = 200;
 
       logger.info('%s.%s [server]: status = %d', ctx.service.name, ctx.service.method, ctx.status);
-      return await next();
+    })
+    .use(async (ctx, next) => {
+      ctx.body = 'Laochan-Eacnet is running.';
+      return next();
     });
 
   logger.info('listening on %d', config.port);
