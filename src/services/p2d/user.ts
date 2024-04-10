@@ -26,6 +26,10 @@ export class User {
     return {
       status: v.s32(0),
       error: v.s32(0),
+      result: {
+        free_count: v.s32(1000),
+        not_free_count: v.s32(1000),
+      }
     };
   }
 
