@@ -27,7 +27,7 @@
     "typescript": "~5.3"
   },
   "scripts": {
-    "start": "node build/src/main.js",
+    "start": "node build/main.js",
     "watch": "tsx watch src/main.ts",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",

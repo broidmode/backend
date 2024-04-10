@@ -2,7 +2,7 @@ import { v } from "../../utils/kxml-value.js";
 import { Game } from "./game.js";
 import { Service } from "./service.js";
 import { User } from "./user.js";
-import data from './data.json';
+import data from './data.json' with { type: "json" };
 import { inject, singleton } from "tsyringe";
 import { Db } from "mongodb";
 
