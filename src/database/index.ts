@@ -51,3 +51,28 @@ export interface PlayerPlayLog {
   flip: number,
   ghost: Buffer,
 };
+
+export interface PlayerCourseLog {
+  _id: ObjectId,
+  player: string;
+  playstyle: number;
+  kind: number;
+  grade_id: number;
+  stage: CourseStage;
+  total: CourseResult;
+}
+
+export interface CourseStage {
+  stage_num: number;
+  clear_flag: number;
+  dj_level: number;
+  clear_rate: number;
+  groove_gage: number;
+}
+
+export interface CourseResult {
+  clear_type: number;
+  max_combo: number;
+  clear_rate: number;
+  groove_gage: number;
+}

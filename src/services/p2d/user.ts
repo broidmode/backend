@@ -3,7 +3,7 @@ import { eacnet } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { ITEM_LIST, MUSIC_LIST } from "./index.js";
-import { PlayerMusicData, PlayerPlayData, PlayerPlayLog } from "../../database/index.js";
+import { PlayerCourseLog, PlayerMusicData, PlayerPlayData, PlayerPlayLog } from "../../database/index.js";
 import { fromToken } from "../../utils/laochan-id.js";
 
 export class User {
@@ -19,6 +19,23 @@ export class User {
 
   get playLogCol() {
     return this.db.collection<PlayerPlayLog>('player_play_log');
+  }
+
+  get courseLogCol() {
+    return this.db.collection<PlayerCourseLog>('player_course_log');
+  }
+
+  @eacnet('p2d')
+  async sendGradeCertificationLog(ctx: Context) {
+    await this.courseLogCol.insertOne({
+      player: ctx.token,
+      ...ctx.body,
+    });
+
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    }
   }
 
   @eacnet('p2d')
