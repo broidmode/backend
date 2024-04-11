@@ -5,6 +5,7 @@ import { User } from "./user.js";
 import data from './data.json' with { type: "json" };
 import { inject, singleton } from "tsyringe";
 import { UserService } from "../../services/p2d/user.js";
+import { Music } from "./music.js";
 
 function Combine(...modules: ({ new(): any })[]) {
   class Modules {
@@ -29,7 +30,7 @@ function Combine(...modules: ({ new(): any })[]) {
 }
 
 @singleton()
-export default class extends Combine(Service, User, Game) {
+export default class extends Combine(Service, User, Game, Music) {
   constructor(
     @inject(UserService) private readonly userService: UserService,
   ) {
