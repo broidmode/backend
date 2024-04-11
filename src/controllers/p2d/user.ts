@@ -124,7 +124,7 @@ export class User {
       if (result.clear_flag > musicData.clear_flag[diff])
         musicData.clear_flag[diff] = result.clear_flag;
 
-      if (result.miss_count < musicData.miss_count[diff])
+      if (result.miss_count < musicData.miss_count[diff] || musicData.miss_count[diff] == -1)
         musicData.miss_count[diff] = result.miss_count;
 
       if (result.score > musicData.score[diff])
