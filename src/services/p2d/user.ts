@@ -128,8 +128,8 @@ export class UserService {
   async getMusicData(player: string, music_id: number, play_style: number): Promise<PlayerMusicData> {
     const result = await this.musicDataCol.findOne({
       player,
-      music_id: music_id,
-      play_style: play_style
+      music_id,
+      play_style,
     });
 
     if (result)
