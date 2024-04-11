@@ -76,3 +76,15 @@ export interface CourseResult {
   clear_rate: number;
   groove_gage: number;
 }
+
+export interface PlayerCustomizeSetting {
+  _id: string;
+  customize: {
+    item_id: string,
+    item_category: number,
+  }[];
+  other_customize: {
+    item_id: string,
+    item_category: number,
+  }[];
+}

@@ -1,15 +1,17 @@
 import 'reflect-metadata';
 
+import cors from '@koa/cors';
 import Koa, { DefaultState } from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { InjectionToken, Provider, container } from 'tsyringe';
 
 import { ILaochanContext } from './types.js';
-import { DefaultService } from './services/default.js';
+import { DefaultService } from './controllers/default.js';
 import { Logger } from '@cordisjs/logger';
 import { eacnet } from './middlewares/eacnet.js';
 import config from './utils/config.js';
 import { MongoClient, Db } from 'mongodb';
+import { apiRoutes } from './apis/index.js';
 
 function tryResolve<T>(token: InjectionToken<T>): T | undefined {
   if (!container.isRegistered(token)) return undefined;
@@ -57,20 +59,21 @@ async function main(): Promise<void> {
         ctx.body = `${e.stack ?? 'Internal Error'}`;
       }
     })
+    .use(cors())
     .use(bodyParser({
       formLimit: '1mb',
     }))
     .use(eacnet)
     .use(async (ctx, next) => {
-      if (!ctx.service) {
-        return await next();
-      }
-
       ctx.logger = ctx.service
         ? register(`logger:${ctx.service.name}:${ctx.service.method}`, {
           useValue: new Logger(`${ctx.service.name}:${ctx.service.method}`),
         })
         : logger;
+
+      if (!ctx.service) {
+        return await next();
+      }
 
       let service: object | undefined = tryResolve(ctx.service.name);
 
@@ -80,17 +83,17 @@ async function main(): Promise<void> {
 
           try {
             module = await import(
-              `./services/${ctx.service.name}/index.js`
+              `./controllers/${ctx.service.name}/index.js`
             );
           } catch (e) {
             if (e.code != 'ERR_MODULE_NOT_FOUND') {
-              logger.error(
+              ctx.logger.error(
                 `load service error %s`,
                 JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
               );
             } else {
               module = await import(
-                `./services/${ctx.service.name}.js`
+                `./controllers/${ctx.service.name}.js`
               );
             }
           }
@@ -100,19 +103,17 @@ async function main(): Promise<void> {
           });
         } catch (e) {
           if (e.code != 'ERR_MODULE_NOT_FOUND') {
-            logger.error(
-              `load service error %s`,
+            ctx.logger.error(
+              `load controller error %s`,
               JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
             );
           }
         }
       }
 
-      logger.info(
-        '%s %s.%s [%s]: request = %s',
+      ctx.logger.info(
+        '%s [%s]: request = %s',
         ctx.url,
-        ctx.service.name,
-        ctx.service.method,
         ctx.token,
         JSON.stringify(ctx.body, (key, value) => {
           if (key === 'pdata') {
@@ -126,7 +127,7 @@ async function main(): Promise<void> {
       let method = ctx.service.method;
 
       if (!service || !(service[method])?.bind) {
-        logger.warn(`unimplemented method ${method} in ${ctx.service.name}`);
+        ctx.logger.warn(`unimplemented method.`);
 
         service = container.resolve(DefaultService);
         method = 'default';
@@ -135,12 +136,18 @@ async function main(): Promise<void> {
       ctx.body = await (service[method] as Function).bind(service)(ctx);
       ctx.status = 200;
 
-      logger.info('%s.%s [server]: status = %d', ctx.service.name, ctx.service.method, ctx.status);
+      ctx.logger.info('[server]: status = %d', ctx.status);
     })
+    .use(apiRoutes)
     .use(async (ctx, next) => {
-      ctx.body = 'Laochan-Eacnet is running.';
+      if (!ctx.body) {
+        ctx.body = 'Laochan-Eacnet is running.';
+      }
+
       return next();
     });
+
+  app.context.resolve = container.resolve.bind(container);
 
   logger.info('listening on %d', config.port);
   app.listen(config.port);

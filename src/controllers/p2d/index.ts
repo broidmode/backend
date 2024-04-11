@@ -4,7 +4,7 @@ import { Service } from "./service.js";
 import { User } from "./user.js";
 import data from './data.json' with { type: "json" };
 import { inject, singleton } from "tsyringe";
-import { Db } from "mongodb";
+import { UserService } from "../../services/p2d/user.js";
 
 function Combine(...modules: ({ new(): any })[]) {
   class Modules {
@@ -31,11 +31,11 @@ function Combine(...modules: ({ new(): any })[]) {
 @singleton()
 export default class extends Combine(Service, User, Game) {
   constructor(
-    @inject(Db) private readonly db: Db,
+    @inject(UserService) private readonly userService: UserService,
   ) {
     super();
 
-    this.db;
+    this.userService;
   }
 }
 
