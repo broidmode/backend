@@ -1,9 +1,10 @@
 import { eacnet } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
-import { ITEM_LIST } from "./index.js";
 import { fromToken } from "../../utils/laochan-id.js";
 import { UserService } from "../../services/p2d/user.js";
+import { sha256 } from "../../utils/sha256.js";
+import { toKBinXml } from "../../utils/kbinxml.js";
 
 export class User {
   userService: UserService;
@@ -38,13 +39,37 @@ export class User {
   }
 
   @eacnet('p2d')
-  async consumeItem() {
+  async consumeItem(ctx: Context) {
+    const { item_id } = ctx.body;
+    const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
+
+    let free_count = 0;
+    let not_free_count = 0;
+
+    if (item_id === 'I1000000') {
+      not_free_count = items_count.infinitas_ticket;
+      free_count = items_count.infinitas_ticket_free;
+    } else if (item_id === 'I1000001') {
+      not_free_count = items_count.ldisc;
+      free_count = 0;
+    }
+
+    free_count--;
+    if (free_count < 0) {
+      free_count = 0;
+      not_free_count--;
+    }
+
+    if (not_free_count < 0) {
+      not_free_count = 0;
+    }
+
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
-        free_count: v.s32(1000),
-        not_free_count: v.s32(1000),
+        free_count: v.s32(free_count),
+        not_free_count: v.s32(not_free_count),
       }
     };
   }
@@ -86,7 +111,9 @@ export class User {
   }
 
   @eacnet('p2d')
-  async getPointList() {
+  async getPointList(ctx: Context) {
+    const customize = await this.userService.getCustomizeSetting(ctx.token);
+
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -94,7 +121,7 @@ export class User {
         point_count: v.s32(1),
         point: [{
           point_id: v.str('P0100000'),
-          point_num: v.u32(114514),
+          point_num: v.u32(customize.items_count.bit),
         }]
       }
     }
@@ -125,6 +152,11 @@ export class User {
   @eacnet('p2d')
   async savePlayData(ctx: Context) {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
+    const localChecksum = sha256(pdata);
+
+    if (localChecksum != check_sum) {
+      ctx.logger.error('pdata checksum unmatch - excepted %s, actual %s', check_sum, localChecksum);
+    }
 
     await this.userService.upsertPDataBinary(ctx.token, pdata, check_sum);
 
@@ -160,6 +192,11 @@ export class User {
   @eacnet('p2d')
   async registPlayer(ctx: Context) {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
+    const localChecksum = sha256(pdata);
+
+    if (localChecksum != check_sum) {
+      ctx.logger.error('pdata checksum unmatch - excepted %s, actual %s', check_sum, localChecksum);
+    }
 
     await this.userService.upsertPDataBinary(ctx.token, pdata, check_sum);
 
@@ -212,11 +249,73 @@ export class User {
   }
 
   @eacnet('p2d')
-  async getRivalInfo() {
+  async getRivalInfo(ctx: Context) {
+    const rivalData = await this.userService.getPlayerRivalData(ctx.token);
+    if (!rivalData.enabled) {
+      return {
+        status: v.s32(0),
+        error: v.s32(0),
+        result: {},
+      }
+    }
+
+    const getRivalDetail = async (id: string, playStyle: number) => {
+      const [pdata, musicDatas] = await Promise.all([
+        this.userService.getPDataDecoded(id),
+        this.userService.getMusicDatas(id, playStyle),
+      ]);
+
+      return {
+        infinitas_id: v.str(pdata.player.infinitas_id),
+        dj_name: v.str(pdata.player.djname),
+        shop_name: v.str('Laochan Eacnet'),
+        pref_id: v.s32(pdata.player.pref_id),
+        grade_id_sp: v.s32(pdata.player.grade_id_sp),
+        grade_id_dp: v.s32(pdata.player.grade_id_dp),
+        music_data: {
+          music: musicDatas.map(data => ({
+            music_id: v.s32(data.music_id),
+            score: v.s32(data.score),
+            clear_flag: v.s32(data.clear_flag),
+          })),
+        },
+        challenges: {},
+        comment: {
+          status_comment: v.str(''),
+          rival_challenge_sweeping_victory: v.str(''),
+          rival_challenge_narrow_victory: v.str(''),
+        }
+      }
+    }
+
+    const [spRival, dpRival] = await Promise.all([
+      Promise.all(rivalData.sp.map(id => getRivalDetail(id, 0))),
+      Promise.all(rivalData.dp.map(id => getRivalDetail(id, 1))),
+    ]);
+
+    const rivalInfo = {
+      sp: {
+        rival_num: v.s32(rivalData.sp.length),
+        rival: spRival,
+      },
+      dp: {
+        rival_num: v.s32(rivalData.dp.length),
+        rival: dpRival,
+      },
+    };
+
+    const rival_binary = Buffer.from(toKBinXml('rival_info', rivalInfo).data);
+    const rival_checksum = sha256(rival_binary);
+
     return {
       status: v.s32(0),
       error: v.s32(0),
-      result: {},
+      result: {
+        check_sum: v.str(rival_checksum),
+        size: v.s32(rival_binary.length),
+        rival_data: v.bin(rival_binary),
+        rest_size: v.s32(0),
+      },
     }
   }
 
@@ -230,18 +329,26 @@ export class User {
   }
 
   @eacnet('p2d')
-  async getItemList() {
+  async getItemList(ctx: Context) {
+    const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
+
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
         item_list: {
-          item_num: v.s32(ITEM_LIST.length),
-          item: ITEM_LIST.map(id => ({
-            item_id: v.str(id),
-            not_free_count: v.s32(1000),
-            free_count: v.s32(1000),
-          }))
+          item_num: v.s32(2),
+          item: [{
+            // infinitas ticket
+            item_id: v.str('I1000000'),
+            not_free_count: v.s32(items_count.infinitas_ticket),
+            free_count: v.s32(items_count.infinitas_ticket_free),
+          }, {
+            // ldisc
+            item_id: v.str('I1000001'),
+            not_free_count: v.s32(items_count.ldisc),
+            free_count: v.s32(0),
+          }]
         }
       }
     };

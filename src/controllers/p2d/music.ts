@@ -1,12 +1,85 @@
-import { PlayerPlayLog } from "../../database/index.js";
+import { PlayerPlayLog } from "../../types/index.js";
 import { eacnet } from "../../decorators/eacnet.js";
 import { UserService } from "../../services/p2d/user.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { MUSIC_LIST } from "./index.js";
+import { Binary } from "mongodb";
 
 export class Music {
   userService: UserService;
+
+  @eacnet('p2d')
+  async getMusicGhost(ctx: Context) {
+    // playstyle is actually chart diff, game is sending wrong request
+    // TODO: check game code and maybe patch it later
+    const data = ctx.body as {
+      music_id: number,
+      note_id: number,
+      playstyle: number,
+      request_ghost: {
+        kind: number,
+        pref_id: number,
+        grade_id: number,
+        infinitas_id?: string,
+      }[] | {
+        kind: number,
+        pref_id: number,
+        grade_id: number,
+        infinitas_id?: string,
+      };
+    };
+
+    const { music_id, note_id } = data;
+    const request_ghost = 'kind' in data.request_ghost ? [data.request_ghost] : data.request_ghost;
+
+    const play_style = Math.floor(note_id / 5);
+    const diff = note_id % 5;
+
+    const ghost = await Promise.all(request_ghost.map(async req => {
+      if (req.kind == 2) {
+        const { player, djname } = await this.userService.findPlayerByInfasId(req.infinitas_id);
+
+        if (!player) {
+          return undefined;
+        }
+
+        const mdata = await this.userService.getMusicData(player, music_id, play_style);
+        if (mdata.best_score_clock[diff] === -1) {
+          return undefined;
+        }
+
+        const playlog = await this.userService.getPlayLog(player, mdata.best_score_clock[diff]);
+
+        return {
+          kind: v.s32(2),
+          ex_score: v.s32(playlog.score),
+          exist: v.bool(true),
+          ghost_data: v.bin(Buffer.from(playlog.ghost.buffer)),
+          dj_name: v.str(djname),
+          best_option: {
+            valid: v.bool(1),
+            arrange_0: v.s32(playlog.arrange_0),
+            arrange_1: v.s32(playlog.arrange_1),
+            assist: v.s32(playlog.assist),
+            flip: v.s32(playlog.flip),
+          }
+        }
+      }
+
+      return undefined;
+    }));
+
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+      result: {
+        music_id: v.s32(music_id),
+        note_id: v.s32(note_id),
+        ghost: ghost.filter(v => v),
+      },
+    };
+  }
 
   @eacnet('p2d')
   async reportMusicResult(ctx: Context) {
@@ -27,8 +100,10 @@ export class Music {
       if (result.miss_count < musicData.miss_count[diff] || musicData.miss_count[diff] == -1)
         musicData.miss_count[diff] = result.miss_count;
 
-      if (result.score > musicData.score[diff])
+      if (result.score > musicData.score[diff]) {
         musicData.score[diff] = result.score;
+        musicData.best_score_clock[diff] = result.clock;
+      }
 
       if (result.clear_flag >= 2)
         musicData.clear_num[diff]++;
@@ -37,6 +112,9 @@ export class Music {
 
       this.userService.upsertMusicData(musicData);
     })();
+
+    // @ts-expect-error ghost is Buffer now, convert it to binary
+    result.ghost = new Binary(result.ghost);
 
     await Promise.all([
       this.userService.addPlayLog(result),

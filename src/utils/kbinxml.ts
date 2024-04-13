@@ -97,7 +97,7 @@ function toObject(node: Record<string, unknown> | unknown[] | string): any {
   return obj;
 }
 
-export function fromKBinXml(kbinxml: Buffer) {
+export function fromKBinXml(kbinxml: Uint8Array) {
   const xml = to_xml(kbinxml).data;
   const parsedXml = parser.parse(xml);
   return toObject(parsedXml);

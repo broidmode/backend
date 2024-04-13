@@ -10,8 +10,9 @@ import { DefaultService } from './controllers/default.js';
 import { Logger } from '@cordisjs/logger';
 import { eacnet } from './middlewares/eacnet.js';
 import config from './utils/config.js';
-import { MongoClient, Db } from 'mongodb';
+import { Db } from 'mongodb';
 import { apiRoutes } from './apis/index.js';
+import { initMongoDb } from './database.js';
 
 function tryResolve<T>(token: InjectionToken<T>): T | undefined {
   if (!container.isRegistered(token)) return undefined;
@@ -34,14 +35,9 @@ async function main(): Promise<void> {
 
   logger.info('initialization...');
 
-  {
-    logger.info('connecting to mongodb...');
-    const client = await MongoClient.connect(config.mongoUrl);
-
-    container.register(Db, {
-      useValue: client.db(config.dbName),
-    });
-  }
+  container.register(Db, {
+    useValue: await initMongoDb(),
+  });
 
   logger.info('creating koa app...');
 

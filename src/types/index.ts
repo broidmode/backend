@@ -6,6 +6,16 @@ export interface PlayerPlayData {
   pdata: Binary;
   // sha256 to ^
   check_sum: string;
+
+  djname: string;
+  infinitas_id: string;
+}
+
+export interface PlayerRivalData {
+  _id: string;
+  enabled: boolean;
+  sp: string[];
+  dp: string[];
 }
 
 export interface PlayerMusicData {
@@ -19,6 +29,9 @@ export interface PlayerMusicData {
   miss_count: number[];
   play_num: number[];
   clear_num: number[];
+
+  // for getting ghost data;
+  best_score_clock: number[];
 }
 
 export interface PlayerPlayLog {
@@ -49,7 +62,7 @@ export interface PlayerPlayLog {
   arrange_1: number,
   assist: number,
   flip: number,
-  ghost: Buffer,
+  ghost: Binary,
 };
 
 export interface PlayerCourseLog {
@@ -79,6 +92,12 @@ export interface CourseResult {
 
 export interface PlayerCustomizeSetting {
   _id: string;
+  items_count: {
+    bit: number;
+    ldisc: number;
+    infinitas_ticket: number;
+    infinitas_ticket_free: number;
+  },
   customize: {
     item_id: string,
     item_category: number,

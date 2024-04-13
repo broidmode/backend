@@ -1,7 +1,7 @@
 import { Binary, Db } from "mongodb";
 import { inject, injectable } from "tsyringe";
-import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting } from "../../database/index.js";
-import { Pdata } from "../../database/pdata.js";
+import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting, PlayerRivalData } from "../../types/index.js";
+import { Pdata } from "../../types/pdata.js";
 import { fromKBinXml } from "../../utils/kbinxml.js";
 
 @injectable()
@@ -34,12 +34,30 @@ export class UserService {
     return this.db.collection<PlayerCustomizeSetting>('player_customize_setting');
   }
 
+  get rivalDataCol() {
+    return this.db.collection<PlayerRivalData>('player_rival_data');
+  }
+
   addCourseLog(coruseLog: PlayerCourseLog) {
     return this.courseLogCol.insertOne(coruseLog);
   }
 
   addPlayLog(playLog: PlayerPlayLog) {
     return this.playLogCol.insertOne(playLog);
+  }
+
+  getPlayLogs(player: string, skip = 0, limit = 10) {
+    return this.playLogCol.find({ player }, {
+      sort: { player: 1, clock: -1 },
+      skip, limit,
+    }).toArray();
+  }
+
+  getCourseLogs(player: string, skip = 0, limit = 10) {
+    return this.courseLogCol.find({ player }, {
+      sort: { player: 1, _id: -1 },
+      skip, limit,
+    }).toArray();
   }
 
   upsertCustomizeSetting(customizeSetting: PlayerCustomizeSetting) {
@@ -50,11 +68,25 @@ export class UserService {
 
   async getCustomizeSetting(player: string): Promise<PlayerCustomizeSetting> {
     const result = await this.customizeSettingCol.findOne({ _id: player });
-    if (result)
+    if (result) {
+      result.items_count ??= {
+        bit: 15000,
+        ldisc: 5,
+        infinitas_ticket: 50,
+        infinitas_ticket_free: 9,
+      };
+
       return result;
+    }
 
     return {
       _id: player,
+      items_count: {
+        bit: 15000,
+        ldisc: 5,
+        infinitas_ticket: 50,
+        infinitas_ticket_free: 9,
+      },
       customize: [
         { item_category: 2, item_id: 'I1100000' },
         { item_category: 3, item_id: 'I1200000' },
@@ -90,6 +122,19 @@ export class UserService {
     return undefined;
   }
 
+  async findPlayerByInfasId(infinitas_id: string): Promise<{ player: string, djname: string } | undefined> {
+    const result = await this.playDataCol.findOne({ infinitas_id }, {
+      projection: {
+        _id: 1, djname: 1,
+      }
+    });
+
+    if (result)
+      return { player: result._id, djname: result.djname };
+
+    return undefined;
+  }
+
   async getPDataBinary(player: string): Promise<{ pdata: Buffer, check_sum: string } | undefined> {
     const result = await this.playDataCol.findOne({ _id: player });
 
@@ -106,13 +151,18 @@ export class UserService {
     const binary = await this.getPDataBinary(player);
     if (!binary) return undefined;
 
-    return fromKBinXml(binary.pdata);
+    return fromKBinXml(binary.pdata).pdata;
   }
 
   upsertPDataBinary(player: string, pdata: Buffer, check_sum: string) {
+    const unpacked = fromKBinXml(pdata) as { pdata: Pdata };
+    const { djname, infinitas_id } = unpacked.pdata.player;
+
     return this.playDataCol
       .updateOne({ _id: player }, {
         $set: {
+          djname, infinitas_id,
+
           pdata: new Binary(pdata),
           check_sum,
         }
@@ -125,6 +175,12 @@ export class UserService {
     }).toArray();
   }
 
+  getPlayLog(player: string, clock: number): Promise<PlayerPlayLog> {
+    return this.playLogCol.findOne({
+      player, clock,
+    });
+  }
+
   async getMusicData(player: string, music_id: number, play_style: number): Promise<PlayerMusicData> {
     const result = await this.musicDataCol.findOne({
       player,
@@ -132,8 +188,10 @@ export class UserService {
       play_style,
     });
 
-    if (result)
+    if (result) {
+      result.best_score_clock ??= [-1, -1, -1, -1, -1];
       return result;
+    }
 
     return {
       player,
@@ -145,6 +203,7 @@ export class UserService {
       miss_count: [-1, -1, -1, -1, -1],
       play_num: [0, 0, 0, 0, 0],
       clear_num: [0, 0, 0, 0, 0],
+      best_score_clock: [-1, -1, -1, -1, -1],
     };
   }
 
@@ -157,6 +216,34 @@ export class UserService {
       $set: musicData
     }, {
       upsert: true
+    });
+  }
+
+  async getPlayerRivalData(player: string): Promise<PlayerRivalData> {
+    const result = await this.rivalDataCol.findOne({ _id: player });
+
+    if (result) {
+      if (!result.dp) result.dp = [];
+      if (!result.sp) result.sp = [];
+
+      return result;
+    }
+
+    return {
+      _id: player,
+      enabled: false,
+      sp: [],
+      dp: [],
+    }
+  }
+
+  upsertPlayerRivalData(rivalData: PlayerRivalData) {
+    return this.rivalDataCol.updateOne({
+      _id: rivalData._id
+    }, {
+      $set: rivalData
+    }, {
+      upsert: true,
     });
   }
 }
