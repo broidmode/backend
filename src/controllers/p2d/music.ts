@@ -5,7 +5,7 @@ import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { MUSIC_LIST } from "./index.js";
 import { Binary } from "mongodb";
-import { omni_musics } from './data.json' with { type: "json" };
+import data from './data.json' with { type: "json" };
 
 // user only needs to unlock omni music, which is temporary
 const userUnlockMusic = new Map<string, number>();
@@ -152,7 +152,7 @@ export class Music {
       const targetMusic = userUnlockMusic.get(ctx.token);
       userUnlockMusic.delete(ctx.token);
 
-      const bitData = omni_musics.find(v => v.id === targetMusic);
+      const bitData = data.omni_musics.find(v => v.id === targetMusic);
 
       music = music.filter(v => v.music_id['__value'] !== targetMusic);
       music.push({
