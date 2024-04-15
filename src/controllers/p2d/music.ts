@@ -5,6 +5,10 @@ import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { MUSIC_LIST } from "./index.js";
 import { Binary } from "mongodb";
+import { omni_musics } from './data.json' with { type: "json" };
+
+// user only needs to unlock omni music, which is temporary
+const userUnlockMusic = new Map<string, number>();
 
 export class Music {
   userService: UserService;
@@ -128,19 +132,49 @@ export class Music {
   }
 
   @eacnet('p2d')
-  async getMusicList() {
+  async unlockMusic(ctx: Context) {
+    const { music: { music_id } } = ctx.body as { music: { music_id: number } };
+    userUnlockMusic.set(ctx.token, music_id);
+
+    console.log(music_id);
+
+    return {
+      status: v.s32(0),
+      error: v.s32(0),
+    };
+  }
+
+  @eacnet('p2d')
+  async getMusicList(ctx: Context) {
+    let music = [...MUSIC_LIST];
+
+    if (userUnlockMusic.has(ctx.token)) {
+      const targetMusic = userUnlockMusic.get(ctx.token);
+      userUnlockMusic.delete(ctx.token);
+
+      const bitData = omni_musics.find(v => v.id === targetMusic);
+
+      music = music.filter(v => v.music_id['__value'] !== targetMusic);
+      music.push({
+        music_id: v.s32(bitData.id),
+        kind: v.s32(1),
+        note_bit: v.s32(bitData.noteBit),
+        music_pack_item_id: v.str(''),
+      });
+    }
+
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
         status: v.s32(0),
-        check_sum: v.str('2e49eba0b6ca8b6898f5d684ea0c3bc1ed6f1d572a4d308cf32727d64069a588'),
+        check_sum: v.str(''),
         music_list: {
-          music_num: v.s32(MUSIC_LIST.length),
-          music: MUSIC_LIST,
+          music_num: v.s32(music.length),
+          music,
         }
       },
-    }
+    };
   }
 
   @eacnet('p2d')

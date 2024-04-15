@@ -5,6 +5,7 @@ import { fromToken } from "../../utils/laochan-id.js";
 import { UserService } from "../../services/p2d/user.js";
 import { sha256 } from "../../utils/sha256.js";
 import { toKBinXml } from "../../utils/kbinxml.js";
+import { ITEM_LIST } from "./index.js";
 
 export class User {
   userService: UserService;
@@ -338,17 +339,20 @@ export class User {
       result: {
         item_list: {
           item_num: v.s32(2),
-          item: [{
-            // infinitas ticket
-            item_id: v.str('I1000000'),
-            not_free_count: v.s32(items_count.infinitas_ticket),
-            free_count: v.s32(items_count.infinitas_ticket_free),
-          }, {
-            // ldisc
-            item_id: v.str('I1000001'),
-            not_free_count: v.s32(items_count.ldisc),
-            free_count: v.s32(0),
-          }]
+          item: [
+            ...ITEM_LIST,
+            {
+              // infinitas ticket
+              item_id: v.str('I1000000'),
+              not_free_count: v.s32(items_count.infinitas_ticket),
+              free_count: v.s32(items_count.infinitas_ticket_free),
+            }, {
+              // ldisc
+              item_id: v.str('I1000001'),
+              not_free_count: v.s32(items_count.ldisc),
+              free_count: v.s32(0),
+            }
+          ]
         }
       }
     };
