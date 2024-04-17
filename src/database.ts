@@ -43,6 +43,30 @@ export async function initMongoDb() {
     meta.version = 1;
   }
 
+  if (meta.version < 2) {
+    const collections = await db.listCollections().toArray();
+    const tryRenameCollection = async (src: string, dest: string) => {
+      if (!collections.some(v => v.name === src)) {
+        return;
+      }
+
+      const col = db.collection(src);
+      await col.rename(dest);
+    };
+
+    await Promise.all([
+      tryRenameCollection('player_play_data', 'p2d_play_data'),
+      tryRenameCollection('player_music_data', 'p2d_music_data'),
+      tryRenameCollection('player_play_log', 'p2d_play_log'),
+      tryRenameCollection('player_course_log', 'p2d_course_log'),
+      tryRenameCollection('player_customize_setting', 'p2d_customize_setting'),
+      tryRenameCollection('player_rival_data', 'p2d_rival_data'),
+    ])
+
+    logger.info('upgraded database to ver 2, renamed prefix player to p2d.');
+    meta.version = 2;
+  }
+
   await metaCol.updateOne({}, { $set: meta }, { upsert: true });
   return db;
 }

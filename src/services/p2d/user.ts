@@ -15,27 +15,27 @@ export class UserService {
   ) { }
 
   get playDataCol() {
-    return this.db.collection<PlayerPlayData>('player_play_data');
+    return this.db.collection<PlayerPlayData>('p2d_play_data');
   }
 
   get musicDataCol() {
-    return this.db.collection<PlayerMusicData>('player_music_data');
+    return this.db.collection<PlayerMusicData>('p2d_music_data');
   }
 
   get playLogCol() {
-    return this.db.collection<PlayerPlayLog>('player_play_log');
+    return this.db.collection<PlayerPlayLog>('p2d_play_log');
   }
 
   get courseLogCol() {
-    return this.db.collection<PlayerCourseLog>('player_course_log');
+    return this.db.collection<PlayerCourseLog>('p2d_course_log');
   }
 
   get customizeSettingCol() {
-    return this.db.collection<PlayerCustomizeSetting>('player_customize_setting');
+    return this.db.collection<PlayerCustomizeSetting>('p2d_customize_setting');
   }
 
   get rivalDataCol() {
-    return this.db.collection<PlayerRivalData>('player_rival_data');
+    return this.db.collection<PlayerRivalData>('p2d_rival_data');
   }
 
   addCourseLog(coruseLog: PlayerCourseLog) {

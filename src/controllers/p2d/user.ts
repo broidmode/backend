@@ -1,4 +1,4 @@
-import { eacnet } from "../../decorators/eacnet.js";
+import { p2d } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { fromToken } from "../../utils/laochan-id.js";
@@ -10,7 +10,7 @@ import { ITEM_LIST } from "./index.js";
 export class User {
   userService: UserService;
 
-  @eacnet('p2d')
+  @p2d()
   async addPoint() {
     return {
       status: v.s32(0),
@@ -18,7 +18,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async reserveChangePoint() {
     return {
       status: v.s32(0),
@@ -26,7 +26,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async sendGradeCertificationLog(ctx: Context) {
     await this.userService.addCourseLog({
       player: ctx.token,
@@ -39,7 +39,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async consumeItem(ctx: Context) {
     const { item_id } = ctx.body;
     const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
@@ -75,7 +75,7 @@ export class User {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async reserveConsumeItem() {
     return {
       status: v.s32(0),
@@ -83,7 +83,7 @@ export class User {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getCustomizeSetting(ctx: Context) {
     const { customize, other_customize } = await this.userService.getCustomizeSetting(ctx.token);
 
@@ -103,7 +103,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async gameEnd() {
     return {
       status: v.s32(0),
@@ -111,7 +111,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getPointList(ctx: Context) {
     const customize = await this.userService.getCustomizeSetting(ctx.token);
 
@@ -128,7 +128,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getPrivilegeClient() {
     return {
       status: v.s32(0),
@@ -139,7 +139,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getPrivilegeServer() {
     return {
       status: v.s32(0),
@@ -150,7 +150,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async savePlayData(ctx: Context) {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
     const localChecksum = sha256(pdata);
@@ -167,7 +167,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getPlayData(ctx: Context) {
     const result = await this.userService.getPDataBinary(ctx.token);
 
@@ -190,7 +190,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async registPlayer(ctx: Context) {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
     const localChecksum = sha256(pdata);
@@ -207,7 +207,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async checkPlayData(ctx: Context) {
     const { check_sum } = ctx.body as { check_sum: string };
 
@@ -249,7 +249,7 @@ export class User {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getRivalInfo(ctx: Context) {
     const rivalData = await this.userService.getPlayerRivalData(ctx.token);
     if (!rivalData.enabled) {
@@ -320,7 +320,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getCompeScoreData() {
     return {
       status: v.s32(0),
@@ -329,7 +329,7 @@ export class User {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getItemList(ctx: Context) {
     const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
 

@@ -1,11 +1,11 @@
 import { PlayerPlayLog } from "../../types/index.js";
-import { eacnet } from "../../decorators/eacnet.js";
+import { p2d } from "../../decorators/eacnet.js";
 import { UserService } from "../../services/p2d/user.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 import { MUSIC_LIST } from "./index.js";
 import { Binary } from "mongodb";
-import data from './data.json' with { type: "json" };
+import * as data from '../../datas/p2d.js'
 
 // user only needs to unlock omni music, which is temporary
 const userUnlockMusic = new Map<string, number>();
@@ -13,7 +13,7 @@ const userUnlockMusic = new Map<string, number>();
 export class Music {
   userService: UserService;
 
-  @eacnet('p2d')
+  @p2d()
   async getMusicGhost(ctx: Context) {
     // playstyle is actually chart diff, game is sending wrong request
     // TODO: check game code and maybe patch it later
@@ -85,7 +85,7 @@ export class Music {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async reportMusicResult(ctx: Context) {
     const result = ctx.body as PlayerPlayLog;
     result.player = ctx.token;
@@ -131,7 +131,7 @@ export class Music {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async unlockMusic(ctx: Context) {
     const { music: { music_id } } = ctx.body as { music: { music_id: number } };
     userUnlockMusic.set(ctx.token, music_id);
@@ -144,7 +144,7 @@ export class Music {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getMusicList(ctx: Context) {
     let music = [...MUSIC_LIST];
 
@@ -177,7 +177,7 @@ export class Music {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getMusicData(ctx: Context) {
     const { play_style } = ctx.body as { play_style: number };
 

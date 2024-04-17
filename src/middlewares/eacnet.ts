@@ -6,16 +6,16 @@ import { fromKBinXml } from '../utils/kbinxml.js';
 export async function eacnet(ctx: Context, next: Next): Promise<any> {
   const body = ctx.request.body as {
     request: string;
-    p2d_token: string;
+    p2d_token?: string;
   } | undefined;
 
   if (!body || !body.request) {
     return next();
   }
 
-  const { request, p2d_token: token } = body;
+  const { request } = body;
 
-  if (!request || !token) {
+  if (!request) {
     return next();
   }
 
@@ -29,11 +29,27 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
   const decoded = LZ77.decompress(buffer);
   const result = fromKBinXml(decoded);
 
-  const game = Object.keys(result)[0];
+  if (result['eacnet']) {
+    const info = result['eacnet'].info;
+    ctx.token = info.token;
 
-  if (!(game in result)) {
+    const request = result['eacnet'].request;
+    if (!request) {
+      return next();
+    }
+
+    ctx.service = {
+      name: info.game_id,
+      method: request.method,
+    };
+
+    ctx.body = request.data ?? {};
+    ctx.eacnetRequest = request;
     return next();
   }
+
+  // for p2d
+  const game = Object.keys(result)[0];
 
   if (result[game].params) {
     ctx.body = result.p2d.params;
@@ -46,6 +62,6 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
     method: result[game].method,
   }
 
-  ctx.token = token;
+  ctx.token = body.p2d_token;
   return next();
 }
