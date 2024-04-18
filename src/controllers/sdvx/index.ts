@@ -1,61 +1,24 @@
 import { sdvx } from "../../decorators/eacnet.js";
 import { Combine } from "../../utils/combine.js";
 import config from "../../utils/config.js";
-import { v } from "../../utils/kxml-value.js";
+import { Serializable, v } from "../../utils/kxml-value.js";
 import { AcRelay } from "./ac-relay.js";
+import { UserService } from "../../services/sdvx/user.js";
+import { inject, singleton } from "tsyringe";
+import { User } from "./user.js";
 
-export default class extends Combine(AcRelay) {
-  @sdvx()
-  async getItemList() {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        item_num: v.s32(0),
-      }
-    };
+@singleton()
+export default class extends Combine(AcRelay, User) {
+  constructor(
+    @inject(UserService) private readonly userService: UserService,
+  ) {
+    super();
+
+    this.userService;
   }
 
   @sdvx()
-  async getGoodsList() {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        goods_num: v.s32(0),
-      }
-    };
-  }
-
-  @sdvx()
-  async getUserIDs() {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        card_num: v.str('0123456789ABCDEF'),
-        ref_id: v.str('0123456789ABCDEF'),
-        data_id: v.str('0123456789ABCDEF'),
-        sns_id: v.str('012345678'),
-      }
-    };
-  }
-
-  @sdvx()
-  async getSubscriptionStatus() {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        subscription: {
-          name: v.str('test'),
-        },
-      }
-    };
-  }
-
-  @sdvx()
-  async heartbeat() {
+  async heartbeat(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),
@@ -72,7 +35,7 @@ export default class extends Combine(AcRelay) {
   }
 
   @sdvx()
-  async checkVersion() {
+  async checkVersion(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),
@@ -83,7 +46,7 @@ export default class extends Combine(AcRelay) {
   }
 
   @sdvx()
-  async getServerClock() {
+  async getServerClock(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),
@@ -94,7 +57,7 @@ export default class extends Combine(AcRelay) {
   }
 
   @sdvx()
-  async getServerState() {
+  async getServerState(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),
@@ -107,7 +70,7 @@ export default class extends Combine(AcRelay) {
   }
 
   @sdvx('SHIFT_JIS')
-  async getServices() {
+  async getServices(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),

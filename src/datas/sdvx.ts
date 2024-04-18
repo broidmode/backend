@@ -1,3 +1,5 @@
+import { v } from "../utils/kxml-value.js";
+
 export const musicDownloadLinks: Record<number, { url: string, hash: string, size: number }> = {
   [1]: {
     url: "https://dks1q2aivwkd6.cloudfront.net/vi/downloads/m_data/5bd191e2-8331-42e9-afbc-ddeda989cae9.bin",
@@ -8285,3 +8287,45 @@ export const musicDownloadLinks: Record<number, { url: string, hash: string, siz
     size: 3790208
   }
 };
+
+export const itemList = [
+  'I1010004',
+  'I1010003',
+  'I1010002',
+  'I1010001',
+  'I1010008',
+  'I1010007',
+  'I1010006',
+  'I1010005',
+  'I1010012',
+  'I1010011',
+  'I1010010',
+  'I1010009',
+  'I1010016',
+  'I1010015',
+  'I1010014',
+  'I1010013',
+  'I1010020',
+  'I1010019',
+  'I1010018',
+  'I1010017',
+  'I1010024',
+  'I1010023',
+  'I1010022',
+  'I1010021',
+  'I1010028',
+  'I1010027',
+  'I1010026',
+  'I1010025',
+  'I1010031',
+  'I1010030',
+  'I1010029',
+];
+
+export const charaItems = [...new Array(46).keys()].map((i) => ({
+  type: v.u8(11),
+  id: v.u32(i),
+  param: v.u32(10),
+}));
+
+console.log(charaItems)

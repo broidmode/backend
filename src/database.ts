@@ -1,9 +1,9 @@
 import { Logger } from "@cordisjs/logger";
 import { MongoClient } from "mongodb";
 import config from "./utils/config.js";
-import { PlayerPlayData } from "./types/index.js";
+import { PlayerPlayData } from "./types/p2d/index.js";
 import { fromKBinXml } from "./utils/kbinxml.js";
-import { Pdata } from "./types/pdata.js";
+import { Pdata } from "./types/p2d/pdata.js";
 
 interface DatabaseMeta {
   version: number;

@@ -1,4 +1,4 @@
-import { PlayerPlayLog } from "../../types/index.js";
+import { PlayerPlayLog } from "../../types/p2d/index.js";
 import { p2d } from "../../decorators/eacnet.js";
 import { UserService } from "../../services/p2d/user.js";
 import { Context } from "../../types.js";
@@ -62,7 +62,7 @@ export class Music {
           ghost_data: v.bin(Buffer.from(playlog.ghost.buffer)),
           dj_name: v.str(djname),
           best_option: {
-            valid: v.bool(1),
+            valid: v.bool(true),
             arrange_0: v.s32(playlog.arrange_0),
             arrange_1: v.s32(playlog.arrange_1),
             assist: v.s32(playlog.assist),

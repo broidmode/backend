@@ -1,11 +1,11 @@
 import { sdvx } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
-import { v } from "../../utils/kxml-value.js";
+import { Serializable, v } from "../../utils/kxml-value.js";
 import * as data from '../../datas/sdvx.js';
 
 export class AcRelay {
   @sdvx()
-  async sv6_music_url(ctx: Context) {
+  async sv6_music_url(ctx: Context): Promise<Serializable> {
     let { music_id } = ctx.body as { music_id: number | number[] };
     if (typeof music_id === 'number') {
       music_id = [music_id];

@@ -1,14 +1,11 @@
 import { Binary, Db } from "mongodb";
 import { inject, injectable } from "tsyringe";
-import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting, PlayerRivalData } from "../../types/index.js";
-import { Pdata } from "../../types/pdata.js";
+import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
+import { Pdata } from "../../types/p2d/pdata.js";
 import { fromKBinXml } from "../../utils/kbinxml.js";
 
 @injectable()
 export class UserService {
-  /**
-   *
-   */
   constructor(
     @inject(Db)
     private readonly db: Db,

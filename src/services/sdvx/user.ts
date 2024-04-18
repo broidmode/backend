@@ -1,0 +1,114 @@
+import { Binary, Db, FindOptions } from "mongodb";
+import { inject, injectable } from "tsyringe";
+import { PlayerPlayData } from "../../types/sdvx/index.js";
+import { tokenToCardNumber, tokenToSdvxId } from "../../utils/laochan-id.js";
+import { v } from "../../utils/kxml-value.js";
+import { dateToString } from "../../utils/time.js";
+import * as data from '../../datas/sdvx.js'
+import { brotliCompress, brotliDecompress } from "zlib";
+import { promisify } from "util";
+import { SaveData } from "../../types/sdvx/savedata.js";
+
+@injectable()
+export class UserService {
+  constructor(
+    @inject(Db)
+    private readonly db: Db,
+  ) { }
+
+  get playDataCol() {
+    return this.db.collection<PlayerPlayData>('sdvx_player_data');
+  }
+
+  async hasPlayerData(token: string) {
+    return !!await this.playDataCol.countDocuments({ _id: token });
+  }
+
+  async savePlayerData(token: string, data: SaveData, name?: string) {
+    const bin = await promisify(brotliCompress)(JSON.stringify(data));
+    const $set = {
+      save_data: new Binary(bin),
+    };
+
+    if (name) {
+      $set['name'] = name;
+    }
+
+    return this.playDataCol.updateOne({ _id: token }, { $set }, { upsert: true })
+  }
+
+  async getPlayerData(token: string, options?: FindOptions): Promise<SaveData | undefined> {
+    const result = await this.playDataCol.findOne({ _id: token }, options);
+    if (!result)
+      return undefined;
+
+    const decompressed = await promisify(brotliDecompress)(result.save_data.buffer)
+    return JSON.parse(decompressed.toString('utf-8'));
+  }
+
+  async createEmptyPlayerData(token: string, name: string) {
+    const save_data: SaveData = {
+      code: v.str(tokenToCardNumber(token)),
+      name: v.str(name),
+      sdvx_id: v.str(tokenToSdvxId(token)),
+      creator_id: v.u32(0),
+      gamecoin_block: v.u32(0),
+      gamecoin_packet: v.u32(0),
+      blaster_energy: v.u32(0),
+      blaster_count: v.u32(0),
+      appeal_id: v.u16(0),
+      skill_level: v.s16(0),
+      skill_base_id: v.s16(0),
+      skill_name_id: v.s16(0),
+
+      hispeed: v.s32(0),
+      lanespeed: v.u32(0),
+      gauge_option: v.u8(0),
+      ars_option: v.u8(0),
+      notes_option: v.u8(0),
+      early_late_disp: v.u8(0),
+      draw_adjust: v.s32(0),
+      eff_c_left: v.u8(0),
+      eff_c_right: v.u8(0),
+      last_music_id: v.s32(0),
+      last_music_type: v.u8(0),
+      sort_type: v.u8(0),
+      narrow_down: v.u8(0),
+      headphone: v.u8(0),
+
+      play_count: v.u32(0),
+      day_count: v.u32(0),
+      today_count: v.u32(0),
+      play_chain: v.u32(0),
+      max_play_chain: v.u32(0),
+      week_count: v.u32(0),
+      week_play_count: v.u32(0),
+      week_chain: v.u32(0),
+      max_week_chain: v.u32(0),
+
+      last_date: v.str(dateToString(new Date())),
+      start_date: v.str(dateToString(new Date())),
+
+      item: {
+        info: [
+          ...data.charaItems,
+        ]
+      },
+      item_cloud: {},
+      item_infinite: {},
+      skill: {},
+      param: {},
+      present: {},
+      cloud: {
+        relation: v.s8(1),
+      },
+      ea_shop: {
+        blaster_pass_enable: v.bool(true),
+        blaster_pass_limit_date: v.u64(0),
+        shop_item: {},
+      },
+    };
+
+    return this.savePlayerData(token, save_data, name);
+  }
+}

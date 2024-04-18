@@ -1,7 +1,7 @@
 import { p2d } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
-import { fromToken } from "../../utils/laochan-id.js";
+import { tokenToInfinitasId } from "../../utils/laochan-id.js";
 import { UserService } from "../../services/p2d/user.js";
 import { sha256 } from "../../utils/sha256.js";
 import { toKBinXml } from "../../utils/kbinxml.js";
@@ -212,7 +212,7 @@ export class User {
     const { check_sum } = ctx.body as { check_sum: string };
 
     const checksum = await this.userService.getPDataChecksum(ctx.token);
-    const id = fromToken(ctx.token);
+    const id = tokenToInfinitasId(ctx.token);
 
     if (!checksum) {
       return {

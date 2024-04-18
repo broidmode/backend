@@ -29,3 +29,6 @@ build/
 .DS_Store
 
 .env
+
+input.xml
+output.json
