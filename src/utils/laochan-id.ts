@@ -21,6 +21,11 @@ export function tokenToCardNumber(token: string) {
   return ('LCHAN' + hash.toUpperCase()).slice(0, 16);
 }
 
+export function tokenToCode(token: string) {
+  const key = highwayHash.asUInt32Low(HIGHWAY_KEY, Buffer.from(token));
+  return 'MOAI' + key.toString().padStart(9, '0').slice(0, 9);
+}
+
 export function tokenToSnsId(token: string) {
   const key = highwayHash.asUInt32Low(HIGHWAY_KEY, Buffer.from(token));
   return key.toString().padStart(8, '0');

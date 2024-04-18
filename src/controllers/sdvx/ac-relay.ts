@@ -5,6 +5,69 @@ import * as data from '../../datas/sdvx.js';
 
 export class AcRelay {
   @sdvx()
+  async sv6_hiscore() {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+          sc: {},
+        }
+      }
+    };
+  }
+
+  @sdvx()
+  async sv6_log(): Promise<Serializable> {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+        }
+      }
+    };
+  }
+
+  @sdvx()
+  async sv6_common(): Promise<Serializable> {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+          music: {},
+          event: {
+            info: data.eventList.map(id => ({
+              event_id: v.str(id),
+            }))
+          },
+          extend: {
+            info: data.extendInfos,
+          },
+          music_limited: {
+            info: data.musicInfos,
+          },
+          skill_course: {
+            info: data.skillCourses,
+          },
+          appealcard: {},
+          valgene: {},
+        }
+      }
+    }
+  }
+
+  @sdvx()
   async sv6_music_url(ctx: Context): Promise<Serializable> {
     let { music_id } = ctx.body as { music_id: number | number[] };
     if (typeof music_id === 'number') {

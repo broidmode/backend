@@ -26,6 +26,22 @@ export class User {
   userService: UserService;
 
   @sdvx()
+  async sv6_play_s(): Promise<Serializable> {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+          play_id: v.u32(Math.floor(new Date().valueOf() / 6e4)),
+         },
+      }
+    };
+  }
+
+  @sdvx()
   async sv6_save(ctx: Context): Promise<Serializable> {
     const playData = await this.userService.getPlayerData(ctx.token);
     if (!playData) {
@@ -144,8 +160,13 @@ export class User {
       }
     }
 
-    // update blaster pass date
+    // blaster pass
+    playData.ea_shop.blaster_pass_enable = v.bool(true);
     playData.ea_shop.blaster_pass_limit_date = v.u64(new Date().valueOf() + (30 * 60 * 60 * 1000));
+    playData.item.info = [
+      ...(playData.item.info ?? []),
+      ...data.charaItems,
+    ];
 
     return {
       status: v.s32(0),
@@ -155,6 +176,7 @@ export class User {
       response: {
         game: {
           $status: 0,
+          result: v.u8(0),
           ...playData,
         }
       }

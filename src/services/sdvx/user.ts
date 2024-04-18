@@ -1,10 +1,9 @@
 import { Binary, Db, FindOptions } from "mongodb";
 import { inject, injectable } from "tsyringe";
 import { PlayerPlayData } from "../../types/sdvx/index.js";
-import { tokenToCardNumber, tokenToSdvxId } from "../../utils/laochan-id.js";
+import { tokenToCode, tokenToSdvxId } from "../../utils/laochan-id.js";
 import { v } from "../../utils/kxml-value.js";
 import { dateToString } from "../../utils/time.js";
-import * as data from '../../datas/sdvx.js'
 import { brotliCompress, brotliDecompress } from "zlib";
 import { promisify } from "util";
 import { SaveData } from "../../types/sdvx/savedata.js";
@@ -47,8 +46,8 @@ export class UserService {
   }
 
   async createEmptyPlayerData(token: string, name: string) {
-    const save_data: SaveData = {
-      code: v.str(tokenToCardNumber(token)),
+    const save_data = {
+      code: v.str(tokenToCode(token)),
       name: v.str(name),
       sdvx_id: v.str(tokenToSdvxId(token)),
       creator_id: v.u32(0),
@@ -69,7 +68,7 @@ export class UserService {
       early_late_disp: v.u8(0),
       draw_adjust: v.s32(0),
       eff_c_left: v.u8(0),
-      eff_c_right: v.u8(0),
+      eff_c_right: v.u8(1),
       last_music_id: v.s32(0),
       last_music_type: v.u8(0),
       sort_type: v.u8(0),
@@ -89,25 +88,19 @@ export class UserService {
       last_date: v.str(dateToString(new Date())),
       start_date: v.str(dateToString(new Date())),
 
-      item: {
-        info: [
-          ...data.charaItems,
-        ]
-      },
+      item: {},
       item_cloud: {},
       item_infinite: {},
       skill: {},
       param: {},
       present: {},
       cloud: {
-        relation: v.s8(1),
+        relation: v.s8(0),
       },
       ea_shop: {
-        blaster_pass_enable: v.bool(true),
-        blaster_pass_limit_date: v.u64(0),
         shop_item: {},
       },
-    };
+    } as SaveData;
 
     return this.savePlayerData(token, save_data, name);
   }

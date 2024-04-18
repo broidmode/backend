@@ -14,10 +14,16 @@ export type ValueTypes = 's8' |
   'str' | 'string' |
   'time';
 
+type AttributeProperty<T> = {
+  [K in keyof T as K extends string ? `$${K}` : never]: T[K]
+}
+
 export type KValueG<T extends ValueTypes, VT = unknown> = {
   $__type: T;
   __value: VT | VT[];
-} & Record<string, unknown>;
+} & AttributeProperty<{
+  [key: string]: string | number;
+}>;
 
 export type KS8 = KValueG<'s8', number>;
 export type KU8 = KValueG<'u8', number>;
@@ -36,12 +42,8 @@ export type KIPv4 = KValueG<'ip4', string>;
 export type KTime = KValueG<'time', Date | number>;
 export type KValue = KS8 | KU8 | KS16 | KU16 | KS32 | KS64 | KU64 | KFloat | KDouble | KBoolean | KBinary | KString | KIPv4 | KTime;
 
-type AttributeProperty<T> = {
-  [K in keyof T as K extends string ? `$${K}` : never]: T[K]
-}
-
 export type Serializable = {
-  [key: string]: KValue | Serializable
+  [key: string]: KValue | Serializable | Serializable[]
 } | AttributeProperty<{
   [key: string]: string | number;
 }>;

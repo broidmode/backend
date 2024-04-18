@@ -6,9 +6,10 @@ import { AcRelay } from "./ac-relay.js";
 import { UserService } from "../../services/sdvx/user.js";
 import { inject, singleton } from "tsyringe";
 import { User } from "./user.js";
+import { Music } from "./music.js";
 
 @singleton()
-export default class extends Combine(AcRelay, User) {
+export default class extends Combine(AcRelay, User, Music) {
   constructor(
     @inject(UserService) private readonly userService: UserService,
   ) {
