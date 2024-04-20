@@ -1,9 +1,10 @@
-import { Binary, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
+import { SaveData } from "./savedata.js";
 
 export interface PlayerPlayData {
   _id: string;
   name: string;
-  save_data: Binary;
+  save_data: SaveData;
 }
 
 export interface PlayerMusicData {

@@ -1,13 +1,10 @@
-import { Binary, Db, FindOptions } from "mongodb";
+import { Db, FindOptions } from "mongodb";
 import { inject, injectable } from "tsyringe";
 import { PlayerMusicData, PlayerPlayData, PlayerPlayLog } from "../../types/sdvx/index.js";
 import { tokenToCode, tokenToSdvxId } from "../../utils/laochan-id.js";
 import { v } from "../../utils/kxml-value.js";
 import { dateToString } from "../../utils/time.js";
-import { brotliCompress, brotliDecompress } from "zlib";
-import { promisify } from "util";
 import { SaveData } from "../../types/sdvx/savedata.js";
-import { writeFileSync } from "fs";
 
 @injectable()
 export class UserService {
@@ -57,16 +54,13 @@ export class UserService {
   }
 
   async savePlayerData(token: string, data: SaveData, name?: string): Promise<boolean> {
-    const bin = await promisify(brotliCompress)(JSON.stringify(data));
     const $set = {
-      save_data: new Binary(bin),
+      save_data: data,
     };
 
     if (name) {
       $set['name'] = name;
     }
-
-    writeFileSync('pdata.json', await promisify(brotliDecompress)(bin));
 
     const result = await this.playDataCol.updateOne({ _id: token }, { $set }, { upsert: true })
     return !!(result.modifiedCount ? result.modifiedCount : result.upsertedCount);
@@ -77,8 +71,7 @@ export class UserService {
     if (!result)
       return undefined;
 
-    const decompressed = await promisify(brotliDecompress)(result.save_data.buffer)
-    return JSON.parse(decompressed.toString('utf-8'));
+    return result.save_data;
   }
 
   async createEmptyPlayerData(token: string, name: string) {
