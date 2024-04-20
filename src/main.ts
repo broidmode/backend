@@ -114,6 +114,10 @@ async function main(): Promise<void> {
         JSON.stringify(ctx.body, (key, value) => {
           if (key === 'pdata') {
             return '<PDATA>';
+          } else if (key == 'item') {
+            return '<ITEM>';
+          } else if (key == 'param') {
+            return '<PARAM>';
           }
 
           return value;

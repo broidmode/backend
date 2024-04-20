@@ -5,6 +5,37 @@ import * as data from '../../datas/sdvx.js';
 
 export class AcRelay {
   @sdvx()
+  async sv6_play_e(): Promise<Serializable> {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+        },
+      }
+    };
+  }
+
+  @sdvx()
+  async sv6_play_s(): Promise<Serializable> {
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(0),
+      xrpc_fault_code: v.s32(0),
+      response: {
+        game: {
+          $status: 0,
+          play_id: v.u32(Math.floor(new Date().valueOf() / 6e4)),
+        },
+      }
+    };
+  }
+
+  @sdvx()
   async sv6_hiscore() {
     return {
       status: v.s32(0),

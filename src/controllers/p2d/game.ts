@@ -15,7 +15,7 @@ export class Game {
         entry_begin_clock: v.u64(0),
         championship_begin_clock: v.u64(0),
         championship_end_clock: v.u64(0),
-        is_possible_play: v.bool(0),
+        is_possible_play: v.bool(false),
         repertoire_list: {
           repertoire_num: v.s32(0),
         }

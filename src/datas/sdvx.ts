@@ -8643,10 +8643,10 @@ export const extendInfos = [
   }
 ];
 
-export const charaItems = [...new Array(46).keys()].map((i) => ({
-  type: v.u8(11),
-  id: v.u32(i),
-  param: v.u32(15),
+export const charaItems = [...new Array(300).keys()].map((i) => ({
+  type: 11,
+  id: i,
+  param: 15,
 }));
 
 export const musicInfos = [];

@@ -4,8 +4,10 @@ import { Context } from "../../types.js";
 import { sdvx } from '../../decorators/eacnet.js';
 import { KValueG, Serializable, ValueTypes, v } from '../../utils/kxml-value.js';
 import { UserService } from '../../services/sdvx/user.js';
+import { Item, Param } from '../../types/sdvx/savedata.js';
+import { dateToString } from '../../utils/time.js';
 
-function trySave<T>(kvalue: KValueG<ValueTypes, T>, value: T) {
+function trySet<T>(kvalue: KValueG<ValueTypes, T>, value: T) {
   if (value === undefined || value === null)
     return;
 
@@ -22,11 +24,74 @@ function tryAdd(kvalue: KValueG<ValueTypes, number>, value: number) {
   kvalue.__value += value;
 }
 
+export function tryMergeItem(params: Item[], newParams: object[]) {
+  if (!params) {
+    params = [];
+  }
+
+  if (!newParams) {
+    return params;
+  }
+
+  if (!(newParams instanceof Array)) {
+    newParams = [newParams];
+  }
+
+  for (const np of newParams) {
+    const target = params.find(p => p.id.__value === np['id'] && p.type.__value === np['type']);
+
+    if (target) {
+      target.type = v.u8(np['type']);
+      target.param = v.u32(np['param']);
+      continue;
+    }
+
+    params.push({
+      type: v.u8(np['type']),
+      id: v.u32(np['id']),
+      param: v.u32(np['param']),
+    })
+  }
+
+  return params;
+}
+
+export function tryMergeParam(params: Param[], newParams: object[]) {
+  if (!params) {
+    params = [];
+  }
+
+  if (!newParams) {
+    return params;
+  }
+
+  if (!(newParams instanceof Array)) {
+    newParams = [newParams];
+  }
+
+  for (const np of newParams) {
+    const target = params.find(p => p.id.__value === np['id'] && p.type.__value === np['type']);
+
+    if (target) {
+      target.param = v.s32(np['param']);
+      continue;
+    }
+
+    params.push({
+      type: v.s32(np['type']),
+      id: v.s32(np['id']),
+      param: v.s32(np['param']),
+    })
+  }
+
+  return params;
+}
+
 export class User {
   userService: UserService;
 
   @sdvx()
-  async sv6_play_s(): Promise<Serializable> {
+  async sv6_save_c(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error_code: v.s32(0),
@@ -36,7 +101,7 @@ export class User {
         game: {
           $status: 0,
           play_id: v.u32(Math.floor(new Date().valueOf() / 6e4)),
-         },
+        },
       }
     };
   }
@@ -55,63 +120,42 @@ export class User {
 
     const newData = ctx.body;
 
-    trySave(playData.skill_level, newData.skill_level);
-    trySave(playData.skill_base_id, newData.skill_base_id);
-    trySave(playData.skill_name_id, newData.skill_name_id);
+    trySet(playData.appeal_id, newData.appeal_id);
+
+    trySet(playData.skill_level, newData.skill_level);
+    trySet(playData.skill_base_id, newData.skill_base_id);
+    trySet(playData.skill_name_id, newData.skill_name_id);
 
     tryAdd(playData.blaster_energy, newData.earned_blaster_energy);
     tryAdd(playData.gamecoin_packet, newData.earned_gamecoin_packet);
     tryAdd(playData.gamecoin_block, newData.earned_gamecoin_block);
 
-    trySave(playData.hispeed, newData.hispeed);
-    trySave(playData.lanespeed, newData.lanespeed);
-    trySave(playData.gauge_option, newData.gauge_option);
-    trySave(playData.ars_option, newData.ars_option);
-    trySave(playData.notes_option, newData.notes_option);
-    trySave(playData.early_late_disp, newData.early_late_disp);
-    trySave(playData.draw_adjust, newData.draw_adjust);
-    trySave(playData.eff_c_left, newData.eff_c_left);
-    trySave(playData.eff_c_right, newData.eff_c_right);
-    trySave(playData.last_music_id, newData.music_id);
-    trySave(playData.last_music_type, newData.music_type);
-    trySave(playData.sort_type, newData.sort_type);
-    trySave(playData.narrow_down, newData.narrow_down);
-    trySave(playData.headphone, newData.headphone);
+    tryAdd(playData.play_count, 1);
 
-    if (newData.item?.info instanceof Array) {
-      playData.item.info = [
-        ...(playData.item.info ?? []),
-        ...newData.item.info.map((info: { id: number; type: number; param: number; }) => ({
-          id: v.u8(info.id),
-          type: v.u32(info.type),
-          param: v.u32(info.param),
-        }))
-      ]
+    trySet(playData.hispeed, newData.hispeed);
+    trySet(playData.lanespeed, newData.lanespeed);
+    trySet(playData.gauge_option, newData.gauge_option);
+    trySet(playData.ars_option, newData.ars_option);
+    trySet(playData.notes_option, newData.notes_option);
+    trySet(playData.early_late_disp, newData.early_late_disp);
+    trySet(playData.draw_adjust, newData.draw_adjust);
+    trySet(playData.eff_c_left, newData.eff_c_left);
+    trySet(playData.eff_c_right, newData.eff_c_right);
+    trySet(playData.last_music_id, newData.music_id);
+    trySet(playData.last_music_type, newData.music_type);
+    trySet(playData.sort_type, newData.sort_type);
+    trySet(playData.narrow_down, newData.narrow_down);
+    trySet(playData.headphone, newData.headphone);
+
+    playData.item.info = tryMergeItem(playData.item.info, newData.item?.info);
+    playData.item_infinite.info = tryMergeItem(playData.item_infinite.info, newData.item_infinite?.info);
+    playData.param.info = tryMergeParam(playData.param.info, newData.param?.info);
+
+    playData.last_date = v.str(dateToString(new Date()));
+
+    if (!await this.userService.savePlayerData(ctx.token, playData)) {
+      ctx.logger.error('play data save failed');
     }
-
-    if (newData.item_infinite?.info instanceof Array) {
-      playData.item_infinite.info = [
-        ...(playData.item_infinite.info ?? []),
-        ...newData.item_infinite.info.map((info: { id: number; type: number; param: number; }) => ({
-          id: v.u8(info.id),
-          type: v.u32(info.type),
-          param: v.u32(info.param),
-        }))
-      ]
-    }
-
-    if (newData.param?.info instanceof Array) {
-      playData.param.info = [
-        ...(playData.param.info ?? []),
-        ...newData.param.info.map((info: { id: number; type: number; param: number; }) => ({
-          id: v.u8(info.id),
-          type: v.u32(info.type),
-          param: v.u32(info.param),
-        }))
-      ]
-    }
-
-    await this.userService.savePlayerData(ctx.token, playData);
 
     return {
       status: v.s32(0),
@@ -163,10 +207,10 @@ export class User {
     // blaster pass
     playData.ea_shop.blaster_pass_enable = v.bool(true);
     playData.ea_shop.blaster_pass_limit_date = v.u64(new Date().valueOf() + (30 * 60 * 60 * 1000));
-    playData.item.info = [
-      ...(playData.item.info ?? []),
-      ...data.charaItems,
-    ];
+
+    // unlock all navigaters
+    playData.item.info = tryMergeItem(playData.item.info, data.charaItems);
+    playData.start_date = v.str(dateToString(new Date()));
 
     return {
       status: v.s32(0),

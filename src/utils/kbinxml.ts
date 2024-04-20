@@ -2,6 +2,7 @@ import { to_bin, to_xml } from "@kamyu/kbinxml";
 import { XMLParser } from "fast-xml-parser";
 import _ from "lodash";
 import { Serializable } from "./kxml-value.js";
+import { writeFileSync } from "fs";
 
 export const parser = new XMLParser({
   ignoreAttributes: false,
@@ -227,5 +228,6 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
 
 export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8') {
   const xml = `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
+  writeFileSync('dump.xml', xml);
   return to_bin(xml);
 }

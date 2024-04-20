@@ -32,3 +32,5 @@ build/
 
 input.xml
 output.json
+dump.xml
+pdata.json

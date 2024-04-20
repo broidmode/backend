@@ -52,7 +52,7 @@ export interface SaveData {
 
   skill: { course?: Course[] };
 
-  param: { info?: Item[] };
+  param: { info?: Param[] };
 
   present: { info?: Item[] };
   cloud: { relation: KS8 };
@@ -83,4 +83,10 @@ export interface Item {
   type: KU8;
   id: KU32;
   param: KU32;
+}
+
+export interface Param {
+  type: KS32;
+  id: KS32;
+  param: KS32;
 }

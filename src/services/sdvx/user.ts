@@ -1,12 +1,13 @@
 import { Binary, Db, FindOptions } from "mongodb";
 import { inject, injectable } from "tsyringe";
-import { PlayerPlayData } from "../../types/sdvx/index.js";
+import { PlayerMusicData, PlayerPlayData, PlayerPlayLog } from "../../types/sdvx/index.js";
 import { tokenToCode, tokenToSdvxId } from "../../utils/laochan-id.js";
 import { v } from "../../utils/kxml-value.js";
 import { dateToString } from "../../utils/time.js";
 import { brotliCompress, brotliDecompress } from "zlib";
 import { promisify } from "util";
 import { SaveData } from "../../types/sdvx/savedata.js";
+import { writeFileSync } from "fs";
 
 @injectable()
 export class UserService {
@@ -19,11 +20,43 @@ export class UserService {
     return this.db.collection<PlayerPlayData>('sdvx_player_data');
   }
 
+  get musicDataCol() {
+    return this.db.collection<PlayerMusicData>('sdvx_music_data');
+  }
+
+  get playLogCol() {
+    return this.db.collection<PlayerPlayLog>('sdvx_play_log');
+  }
+
+  getPlayerMusicData(token: string, music_id: number, music_type: number) {
+    return this.musicDataCol.findOne({ player: token, music_id, music_type });
+  }
+
+  getPlayerMusicDatas(token: string) {
+    return this.musicDataCol.find({ player: token }).toArray();
+  }
+
+  async upsertMusicData(musicData: PlayerMusicData) {
+    return await this.musicDataCol.updateOne({
+      player: musicData.player,
+      music_id: musicData.music_id,
+      music_type: musicData.music_type,
+    }, {
+      $set: musicData
+    }, {
+      upsert: true
+    });
+  };
+
+  async insertPlayLog(playlog: PlayerPlayLog) {
+    return this.playLogCol.insertOne(playlog);
+  }
+
   async hasPlayerData(token: string) {
     return !!await this.playDataCol.countDocuments({ _id: token });
   }
 
-  async savePlayerData(token: string, data: SaveData, name?: string) {
+  async savePlayerData(token: string, data: SaveData, name?: string): Promise<boolean> {
     const bin = await promisify(brotliCompress)(JSON.stringify(data));
     const $set = {
       save_data: new Binary(bin),
@@ -33,7 +66,10 @@ export class UserService {
       $set['name'] = name;
     }
 
-    return this.playDataCol.updateOne({ _id: token }, { $set }, { upsert: true })
+    writeFileSync('pdata.json', await promisify(brotliDecompress)(bin));
+
+    const result = await this.playDataCol.updateOne({ _id: token }, { $set }, { upsert: true })
+    return !!(result.modifiedCount ? result.modifiedCount : result.upsertedCount);
   }
 
   async getPlayerData(token: string, options?: FindOptions): Promise<SaveData | undefined> {
@@ -95,7 +131,7 @@ export class UserService {
       param: {},
       present: {},
       cloud: {
-        relation: v.s8(0),
+        relation: v.s8(1),
       },
       ea_shop: {
         shop_item: {},
