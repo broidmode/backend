@@ -40,7 +40,8 @@
     "lint:fix": "eslint . --ext .ts --ext .mts --fix",
     "test": "jest --coverage",
     "prettier": "prettier --config .prettierrc --write .",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "xmltojson": "tsx src/tool/xml-to-json.ts"
   },
   "author": "GEEKiDoS",
   "license": "MIT",
@@ -53,6 +54,7 @@
     "dedent-js": "^1.0.1",
     "dotenv": "^16.4.5",
     "fast-xml-parser": "^4.3.2",
+    "highwayhash": "^3.1.1",
     "koa": "^2.15.0",
     "koa-bodyparser": "^4.4.1",
     "lodash": "^4.17.21",

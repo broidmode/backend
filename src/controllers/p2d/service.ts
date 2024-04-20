@@ -1,10 +1,10 @@
-import { eacnet } from '../../decorators/eacnet.js';
+import { p2d } from '../../decorators/eacnet.js';
 import { Context } from '../../types.js';
 import config from '../../utils/config.js';
 import { v } from '../../utils/kxml-value.js';
 
 export class Service {
-  @eacnet('p2d')
+  @p2d()
   async sendLog() {
     return {
       status: v.s32(0),
@@ -12,7 +12,7 @@ export class Service {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getServerState() {
     return {
       status: v.s32(0),
@@ -25,7 +25,7 @@ export class Service {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getServerClock() {
     return {
       status: v.s32(0),
@@ -36,7 +36,7 @@ export class Service {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async heartbeat(ctx: Context) {
     return {
       status: v.s32(0),
@@ -51,7 +51,7 @@ export class Service {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async checkSendLogAvailable() {
     return {
       status: v.s32(0),
@@ -63,7 +63,7 @@ export class Service {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getServices() {
     return {
       status: v.s32(0),

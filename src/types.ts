@@ -10,6 +10,13 @@ export interface ILaochanContext {
     method: string,
   };
 
+  eacnetRequest?: {
+    service: string;
+    module: string;
+    method: string;
+    data: unknown;
+  };
+
   logger: Logger;
   body?: unknown;
   resolve: <T>(resolveToken: InjectionToken<T>) => T;

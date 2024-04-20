@@ -2,8 +2,8 @@ import { Logger } from "@cordisjs/logger";
 import Router from "@koa/router";
 import { Context } from "../index.js";
 import { UserService } from "../../services/p2d/user.js";
-import { PlayerCustomizeSetting, PlayerRivalData } from "../../types/index.js";
-import { RivalPatch, RivalPostOrDelete } from "../../types/api.js";
+import { PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
+import { RivalPatch, RivalPostOrDelete } from "../../types/p2d/api.js";
 
 const logger = new Logger('p2d-api');
 const router = new Router({

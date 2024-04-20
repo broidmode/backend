@@ -1,9 +1,9 @@
-import { eacnet } from "../../decorators/eacnet.js";
+import { p2d } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
 
 export class Game {
-  @eacnet('p2d')
+  @p2d()
   async getChampionshipInfo() {
     return {
       status: v.s32(0),
@@ -15,7 +15,7 @@ export class Game {
         entry_begin_clock: v.u64(0),
         championship_begin_clock: v.u64(0),
         championship_end_clock: v.u64(0),
-        is_possible_play: v.bool(0),
+        is_possible_play: v.bool(false),
         repertoire_list: {
           repertoire_num: v.s32(0),
         }
@@ -23,7 +23,7 @@ export class Game {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getServerValues() {
     return {
       status: v.s32(0),
@@ -41,7 +41,7 @@ export class Game {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async checkGameVersion() {
     return {
       status: v.s32(0),
@@ -52,7 +52,7 @@ export class Game {
     };
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getClearRate(ctx: Context) {
     const { play_style } = ctx.body as { play_style: number };
     return {
@@ -63,7 +63,7 @@ export class Game {
     }
   }
 
-  @eacnet('p2d')
+  @p2d()
   async getGoodsList() {
     const goods = [{
       goods_id: v.str('G1000000'),

@@ -1,9 +1,9 @@
 import { Logger } from "@cordisjs/logger";
 import { MongoClient } from "mongodb";
 import config from "./utils/config.js";
-import { PlayerPlayData } from "./types/index.js";
+import { PlayerPlayData } from "./types/p2d/index.js";
 import { fromKBinXml } from "./utils/kbinxml.js";
-import { Pdata } from "./types/pdata.js";
+import { Pdata } from "./types/p2d/pdata.js";
 
 interface DatabaseMeta {
   version: number;
@@ -41,6 +41,30 @@ export async function initMongoDb() {
 
     logger.info('upgraded database to ver 1, effected %d', tasks.length);
     meta.version = 1;
+  }
+
+  if (meta.version < 2) {
+    const collections = await db.listCollections().toArray();
+    const tryRenameCollection = async (src: string, dest: string) => {
+      if (!collections.some(v => v.name === src)) {
+        return;
+      }
+
+      const col = db.collection(src);
+      await col.rename(dest);
+    };
+
+    await Promise.all([
+      tryRenameCollection('player_play_data', 'p2d_play_data'),
+      tryRenameCollection('player_music_data', 'p2d_music_data'),
+      tryRenameCollection('player_play_log', 'p2d_play_log'),
+      tryRenameCollection('player_course_log', 'p2d_course_log'),
+      tryRenameCollection('player_customize_setting', 'p2d_customize_setting'),
+      tryRenameCollection('player_rival_data', 'p2d_rival_data'),
+    ])
+
+    logger.info('upgraded database to ver 2, renamed prefix player to p2d.');
+    meta.version = 2;
   }
 
   await metaCol.updateOne({}, { $set: meta }, { upsert: true });
