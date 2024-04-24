@@ -176,7 +176,7 @@ export class Service {
           {
             service_name: v.str(`getDownloadResource`),
             url: v.str(
-              'https://d1rc4pwxnc0pe0.cloudfront.net/',
+              'https://d1rc4pwxnc0pe0.cloudfront.net/v3/resource/distribution/ondemand',
             ),
           },
           {
