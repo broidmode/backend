@@ -5956,7 +5956,40 @@ export const musics = [
   {
     "id": 80051,
     "noteBit": 462
-  }
+  },
+  // bandori musics
+  {
+    "id": 70032,
+    "noteBit": 31
+  },
+  {
+    "id": 70037,
+    "noteBit": 31
+  },
+  {
+    "id": 70093,
+    "noteBit": 31
+  },
+  {
+    "id": 70158,
+    "noteBit": 31
+  },
+  {
+    "id": 70187,
+    "noteBit": 31
+  },
+  {
+    "id": 70288,
+    "noteBit": 15
+  },
+  {
+    "id": 70513,
+    "noteBit": 15
+  },
+  {
+    "id": 70581,
+    "noteBit": 15
+  },
 ];
 
 export const omni_musics = [
