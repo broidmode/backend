@@ -242,6 +242,10 @@ export const musics = [
     "noteBit": 206
   },
   {
+    "id": 5010,
+    "noteBit": 462
+  },
+  {
     "id": 5011,
     "noteBit": 462
   },
@@ -471,7 +475,7 @@ export const musics = [
   },
   {
     "id": 8008,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 8009,
@@ -1298,6 +1302,10 @@ export const musics = [
     "noteBit": 463
   },
   {
+    "id": 14013,
+    "noteBit": 206
+  },
+  {
     "id": 14014,
     "noteBit": 462
   },
@@ -1499,7 +1507,7 @@ export const musics = [
   },
   {
     "id": 15018,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 15019,
@@ -1803,7 +1811,7 @@ export const musics = [
   },
   {
     "id": 17001,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 17002,
@@ -2303,7 +2311,7 @@ export const musics = [
   },
   {
     "id": 19011,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 19012,
@@ -2395,7 +2403,7 @@ export const musics = [
   },
   {
     "id": 19035,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 19036,
@@ -4163,7 +4171,7 @@ export const musics = [
   },
   {
     "id": 24081,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 24082,
@@ -4291,7 +4299,7 @@ export const musics = [
   },
   {
     "id": 25021,
-    "noteBit": 463
+    "noteBit": 991
   },
   {
     "id": 25022,
@@ -4771,7 +4779,7 @@ export const musics = [
   },
   {
     "id": 26069,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 26071,
@@ -4962,6 +4970,10 @@ export const musics = [
     "noteBit": 462
   },
   {
+    "id": 27011,
+    "noteBit": 462
+  },
+  {
     "id": 27012,
     "noteBit": 462
   },
@@ -4971,7 +4983,7 @@ export const musics = [
   },
   {
     "id": 27014,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 27015,
@@ -5383,6 +5395,10 @@ export const musics = [
   },
   {
     "id": 28044,
+    "noteBit": 462
+  },
+  {
+    "id": 28045,
     "noteBit": 462
   },
   {
@@ -5807,7 +5823,7 @@ export const musics = [
   },
   {
     "id": 80017,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 80018,
@@ -5986,10 +6002,6 @@ export const omni_musics = [
   },
   {
     "id": 4029,
-    "noteBit": 462
-  },
-  {
-    "id": 5010,
     "noteBit": 462
   },
   {
@@ -6593,10 +6605,6 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
-    "id": 27011,
-    "noteBit": 462
-  },
-  {
     "id": 27017,
     "noteBit": 462
   },
@@ -6694,10 +6702,6 @@ export const omni_musics = [
   },
   {
     "id": 28038,
-    "noteBit": 462
-  },
-  {
-    "id": 28045,
     "noteBit": 462
   },
   {
