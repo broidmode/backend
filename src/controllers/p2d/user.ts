@@ -1,6 +1,6 @@
 import { p2d } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
-import { v } from "../../utils/kxml-value.js";
+import { Serializable, v } from "../../utils/kxml-value.js";
 import { tokenToInfinitasId } from "../../utils/laochan-id.js";
 import { UserService } from "../../services/p2d/user.js";
 import { sha256 } from "../../utils/sha256.js";
@@ -11,23 +11,50 @@ export class User {
   userService: UserService;
 
   @p2d()
-  async addPoint() {
+  async addPoint(ctx: Context): Promise<Serializable> {
+    let { point: points } = ctx.body as { point: { point_id: string, point_num: number }[] };
+    if (!(points instanceof Array))
+      points = [points];
+
+    const pointSums = new Map<string, { point_id: string, point_num: number }>();
+
+    for (const point of points) {
+      const pointSum = pointSums.get(point.point_id) ?? {
+        point_id: point.point_id,
+        point_num: 0,
+      };
+
+      pointSum.point_num += point.point_num;
+
+      pointSums.set(point.point_id, pointSum);
+    }
+
     return {
       status: v.s32(0),
       error: v.s32(0),
+      result: {
+        point_count: v.s32(pointSums.size),
+        point: Array.from(pointSums.values()).map(sum => ({
+          point_id: v.str(sum.point_id),
+          point_num: v.u32(sum.point_num),
+        })),
+      }
     }
   }
 
   @p2d()
-  async reserveChangePoint() {
+  async reserveChangePoint(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
+      result: {
+        transaction_id: v.str('dummy_transaction_id'),
+      }
     }
   }
 
   @p2d()
-  async sendGradeCertificationLog(ctx: Context) {
+  async sendGradeCertificationLog(ctx: Context): Promise<Serializable> {
     await this.userService.addCourseLog({
       player: ctx.token,
       ...ctx.body,
@@ -40,7 +67,7 @@ export class User {
   }
 
   @p2d()
-  async consumeItem(ctx: Context) {
+  async consumeItem(ctx: Context): Promise<Serializable> {
     const { item_id } = ctx.body;
     const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
 
@@ -76,7 +103,7 @@ export class User {
   }
 
   @p2d()
-  async reserveConsumeItem() {
+  async reserveConsumeItem(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -84,7 +111,7 @@ export class User {
   }
 
   @p2d()
-  async getCustomizeSetting(ctx: Context) {
+  async getCustomizeSetting(ctx: Context): Promise<Serializable> {
     const { customize, other_customize } = await this.userService.getCustomizeSetting(ctx.token);
 
     return {
@@ -104,7 +131,7 @@ export class User {
   }
 
   @p2d()
-  async gameEnd() {
+  async gameEnd(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -112,7 +139,7 @@ export class User {
   }
 
   @p2d()
-  async getPointList(ctx: Context) {
+  async getPointList(ctx: Context): Promise<Serializable> {
     const customize = await this.userService.getCustomizeSetting(ctx.token);
 
     return {
@@ -129,7 +156,7 @@ export class User {
   }
 
   @p2d()
-  async getPrivilegeClient() {
+  async getPrivilegeClient(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -140,7 +167,7 @@ export class User {
   }
 
   @p2d()
-  async getPrivilegeServer() {
+  async getPrivilegeServer(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -151,7 +178,7 @@ export class User {
   }
 
   @p2d()
-  async savePlayData(ctx: Context) {
+  async savePlayData(ctx: Context): Promise<Serializable> {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
     const localChecksum = sha256(pdata);
 
@@ -168,7 +195,7 @@ export class User {
   }
 
   @p2d()
-  async getPlayData(ctx: Context) {
+  async getPlayData(ctx: Context): Promise<Serializable> {
     const result = await this.userService.getPDataBinary(ctx.token);
 
     if (!result) {
@@ -191,7 +218,7 @@ export class User {
   }
 
   @p2d()
-  async registPlayer(ctx: Context) {
+  async registPlayer(ctx: Context): Promise<Serializable> {
     const { pdata, check_sum } = ctx.body as { pdata: Buffer, check_sum: string };
     const localChecksum = sha256(pdata);
 
@@ -208,7 +235,7 @@ export class User {
   }
 
   @p2d()
-  async checkPlayData(ctx: Context) {
+  async checkPlayData(ctx: Context): Promise<Serializable> {
     const { check_sum } = ctx.body as { check_sum: string };
 
     const checksum = await this.userService.getPDataChecksum(ctx.token);
@@ -250,7 +277,7 @@ export class User {
   }
 
   @p2d()
-  async getRivalInfo(ctx: Context) {
+  async getRivalInfo(ctx: Context): Promise<Serializable> {
     const rivalData = await this.userService.getPlayerRivalData(ctx.token);
     if (!rivalData.enabled) {
       return {
@@ -321,7 +348,7 @@ export class User {
   }
 
   @p2d()
-  async getCompeScoreData() {
+  async getCompeScoreData(): Promise<Serializable> {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -330,29 +357,31 @@ export class User {
   }
 
   @p2d()
-  async getItemList(ctx: Context) {
+  async getItemList(ctx: Context): Promise<Serializable> {
     const { items_count } = await this.userService.getCustomizeSetting(ctx.token);
+
+    const item = [
+      ...ITEM_LIST,
+      {
+        // infinitas ticket
+        item_id: v.str('I1000000'),
+        not_free_count: v.s32(items_count.infinitas_ticket),
+        free_count: v.s32(items_count.infinitas_ticket_free),
+      }, {
+        // ldisc
+        item_id: v.str('I1000001'),
+        not_free_count: v.s32(items_count.ldisc),
+        free_count: v.s32(0),
+      }
+    ];
 
     return {
       status: v.s32(0),
       error: v.s32(0),
       result: {
         item_list: {
-          item_num: v.s32(2),
-          item: [
-            ...ITEM_LIST,
-            {
-              // infinitas ticket
-              item_id: v.str('I1000000'),
-              not_free_count: v.s32(items_count.infinitas_ticket),
-              free_count: v.s32(items_count.infinitas_ticket_free),
-            }, {
-              // ldisc
-              item_id: v.str('I1000001'),
-              not_free_count: v.s32(items_count.ldisc),
-              free_count: v.s32(0),
-            }
-          ]
+          item_num: v.s32(item.length),
+          item,
         }
       }
     };

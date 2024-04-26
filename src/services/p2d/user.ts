@@ -73,6 +73,10 @@ export class UserService {
         infinitas_ticket_free: 9,
       };
 
+      if (!result.customize.find(v => v.item_category === 12)) {
+        result.customize.push({ item_category: 12, item_id: 'I2100000' });
+      }
+
       return result;
     }
 
@@ -94,6 +98,7 @@ export class UserService {
         { item_category: 8, item_id: 'I1700000' },
         { item_category: 11, item_id: 'I1300000' },
         { item_category: 10, item_id: 'I1900000' },
+        { item_category: 12, item_id: 'I2100000' },
       ],
       other_customize: [
         { item_category: 1, item_id: 'C1000000' },
