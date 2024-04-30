@@ -63,6 +63,8 @@ export interface PlayerPlayLog {
   assist: number,
   flip: number,
   ghost: Binary,
+
+  modifier: number,
 };
 
 export interface PlayerCourseLog {

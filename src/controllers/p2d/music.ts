@@ -98,21 +98,24 @@ export class Music {
     updateTask = (async () => {
       const musicData = await this.userService.getMusicData(result.player, result.music_id, play_style);
 
-      if (result.clear_flag > musicData.clear_flag[diff])
-        musicData.clear_flag[diff] = result.clear_flag;
-
-      if (result.miss_count < musicData.miss_count[diff] || musicData.miss_count[diff] == -1)
-        musicData.miss_count[diff] = result.miss_count;
-
-      if (result.score > musicData.score[diff]) {
-        musicData.score[diff] = result.score;
-        musicData.best_score_clock[diff] = result.clock;
-      }
-
-      if (result.clear_flag >= 2)
-        musicData.clear_num[diff]++;
-
       musicData.play_num[diff]++;
+
+      // don't save score if player enabled modifier
+      if (!result.modifier) {
+        if (result.clear_flag > musicData.clear_flag[diff])
+          musicData.clear_flag[diff] = result.clear_flag;
+
+        if (result.miss_count < musicData.miss_count[diff] || musicData.miss_count[diff] == -1)
+          musicData.miss_count[diff] = result.miss_count;
+
+        if (result.score > musicData.score[diff]) {
+          musicData.score[diff] = result.score;
+          musicData.best_score_clock[diff] = result.clock;
+        }
+
+        if (result.clear_flag >= 2)
+          musicData.clear_num[diff]++;
+      }
 
       this.userService.upsertMusicData(musicData);
     })();
