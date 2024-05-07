@@ -4,7 +4,6 @@ import { Context } from "../index.js";
 import { UserService } from "../../services/p2d/user.js";
 import { PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
 import { RivalPatch, RivalPostOrDelete } from "../../types/p2d/api.js";
-import { toLower } from "lodash";
 
 const logger = new Logger('p2d-api');
 const router = new Router({
