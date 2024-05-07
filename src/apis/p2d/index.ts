@@ -4,11 +4,32 @@ import { Context } from "../index.js";
 import { UserService } from "../../services/p2d/user.js";
 import { PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
 import { RivalPatch, RivalPostOrDelete } from "../../types/p2d/api.js";
+import { toLower } from "lodash";
 
 const logger = new Logger('p2d-api');
 const router = new Router({
   prefix: '/p2d',
 })
+
+  .get('/bot/player/:infinitas_id', async (ctx: Context) => {
+    const { infinitas_id } = ctx.params;
+
+    if (!infinitas_id) {
+      ctx.status = 400;
+      return;
+    }
+
+    const player = await ctx.resolve(UserService).findPlayerByInfasId(infinitas_id);
+
+    if (!player) {
+      ctx.status = 404;
+    }
+
+    ctx.body = {
+      found: !!player,
+      player,
+    };
+  })
 
   .get('/pdata/:token', async (ctx: Context) => {
     const { token } = ctx.params;
