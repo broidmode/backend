@@ -6046,6 +6046,10 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 5010,
+    "noteBit": 462
+  },
+  {
     "id": 5018,
     "noteBit": 198
   },
@@ -6251,7 +6255,7 @@ export const omni_musics = [
   },
   {
     "id": 12051,
-    "noteBit": 462
+    "noteBit": 990
   },
   {
     "id": 13025,
@@ -6646,6 +6650,10 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 27011,
+    "noteBit": 462
+  },
+  {
     "id": 27017,
     "noteBit": 462
   },
@@ -6743,6 +6751,10 @@ export const omni_musics = [
   },
   {
     "id": 28038,
+    "noteBit": 462
+  },
+  {
+    "id": 28045,
     "noteBit": 462
   },
   {
@@ -7474,6 +7486,10 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 31014,
+    "noteBit": 462
+  },
+  {
     "id": 31015,
     "noteBit": 462
   },
@@ -7494,6 +7510,10 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 31020,
+    "noteBit": 462
+  },
+  {
     "id": 31021,
     "noteBit": 463
   },
@@ -7503,6 +7523,10 @@ export const omni_musics = [
   },
   {
     "id": 31023,
+    "noteBit": 463
+  },
+  {
+    "id": 31024,
     "noteBit": 463
   },
   {
@@ -7618,11 +7642,19 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 31057,
+    "noteBit": 462
+  },
+  {
     "id": 31058,
     "noteBit": 462
   },
   {
     "id": 31060,
+    "noteBit": 462
+  },
+  {
+    "id": 31061,
     "noteBit": 462
   },
   {
@@ -7650,6 +7682,10 @@ export const omni_musics = [
     "noteBit": 462
   },
   {
+    "id": 31069,
+    "noteBit": 462
+  },
+  {
     "id": 31070,
     "noteBit": 462
   },
@@ -7667,6 +7703,10 @@ export const omni_musics = [
   },
   {
     "id": 31074,
+    "noteBit": 462
+  },
+  {
+    "id": 31075,
     "noteBit": 462
   },
   {
@@ -7750,8 +7790,27 @@ export const omni_musics = [
     "noteBit": 463
   },
   {
+    "id": 31100,
+    "noteBit": 463
+  },
+  {
+    "id": 31101,
+    "noteBit": 463
+  },
+  {
+    "id": 31102,
+    "noteBit": 463
+  },
+  {
     "id": 31103,
+    "noteBit": 462
+  },
+  {
+    "id": 31104,
+    "noteBit": 462
+  },
+  {
+    "id": 31105,
     "noteBit": 462
   }
 ];
-
