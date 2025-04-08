@@ -1,5 +1,5 @@
 import { Context } from '../types.js';
-import { p2d, sdvx } from '../decorators/eacnet.js';
+import { generic, p2d } from '../decorators/eacnet.js';
 import { v } from '../utils/kxml-value.js';
 import { singleton } from 'tsyringe';
 
@@ -17,7 +17,7 @@ export class DefaultService {
 
       p2d()(undefined, undefined, descriptor);
       return descriptor.value();
-    } else if (ctx.service.name === 'sdvx') {
+    } else if (['sdvx', 'ddr'].includes(ctx.service.name)) {
       const result = {
         status: v.s32(0),
         error_code: v.s32(0),
@@ -39,7 +39,7 @@ export class DefaultService {
         value: () => result,
       };
 
-      sdvx()(undefined, undefined, descriptor);
+      generic()(undefined, undefined, descriptor);
       return descriptor.value();
     }
 

@@ -40,6 +40,7 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
 
     ctx.service = {
       name: info.game_id,
+      module: info.module,
       method: request.method,
     };
 
@@ -59,6 +60,7 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
 
   ctx.service = {
     name: game,
+    module: 'p2d',
     method: result[game].method,
   }
 

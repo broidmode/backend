@@ -1,4 +1,4 @@
-import { sdvx } from "../../decorators/eacnet.js";
+import { generic } from "../../decorators/eacnet.js";
 import { UserService } from "../../services/sdvx/user.js";
 import { Serializable, v } from "../../utils/kxml-value.js";
 import { Context } from "../../types.js";
@@ -7,7 +7,7 @@ import { PlayerMusicData, PlayerPlayLog } from "../../types/sdvx/index.js";
 export class Music {
   userService: UserService;
 
-  @sdvx()
+  @generic()
   async sv6_save_m(ctx: Context): Promise<Serializable> {
     const { track } = ctx.body as { track: PlayerPlayLog };
 
@@ -74,7 +74,7 @@ export class Music {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_load_r(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -94,7 +94,7 @@ export class Music {
    * score exscore clear_type score_grade max_chain play_count btn_rate long_rate vol_rate
    * 0 0 0 0 0 timestamp_s 0 0 0 0 0 0
    */
-  @sdvx()
+  @generic()
   async sv6_load_m(ctx: Context): Promise<Serializable> {
     const mdata = await this.userService.getPlayerMusicDatas(ctx.token);
 

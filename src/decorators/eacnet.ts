@@ -21,4 +21,4 @@ export function eacnet(protocol_name: string, topName: string, dataOffset: numbe
 }
 
 export const p2d = eacnet('P2D:2015091800', 'p2d', 0x2E);
-export const sdvx = eacnet('2020090800', 'eacnet', 0x2A);
+export const generic = eacnet('2020090800', 'eacnet', 0x2A);

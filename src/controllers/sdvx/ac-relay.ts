@@ -1,10 +1,10 @@
-import { sdvx } from "../../decorators/eacnet.js";
+import { generic } from "../../decorators/eacnet.js";
 import { Context } from "../../types.js";
 import { Serializable, v } from "../../utils/kxml-value.js";
 import * as data from '../../datas/sdvx.js';
 
 export class AcRelay {
-  @sdvx()
+  @generic()
   async sv6_play_e(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -19,7 +19,7 @@ export class AcRelay {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_play_s(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -35,7 +35,7 @@ export class AcRelay {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_hiscore() {
     return {
       status: v.s32(0),
@@ -51,7 +51,7 @@ export class AcRelay {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_log(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -66,7 +66,7 @@ export class AcRelay {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_common(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -98,7 +98,7 @@ export class AcRelay {
     }
   }
 
-  @sdvx()
+  @generic()
   async sv6_music_url(ctx: Context): Promise<Serializable> {
     let { music_id } = ctx.body as { music_id: number | number[] };
     if (typeof music_id === 'number') {

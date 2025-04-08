@@ -1,7 +1,7 @@
 import * as data from '../../datas/sdvx.js';
 import { tokenToCardNumber, tokenToHash, tokenToSnsId } from "../../utils/laochan-id.js";
 import { Context } from "../../types.js";
-import { sdvx } from '../../decorators/eacnet.js';
+import { generic } from '../../decorators/eacnet.js';
 import { KValueG, Serializable, ValueTypes, v } from '../../utils/kxml-value.js';
 import { UserService } from '../../services/sdvx/user.js';
 import { Item, Param } from '../../types/sdvx/savedata.js';
@@ -90,7 +90,7 @@ export function tryMergeParam(params: Param[], newParams: object[]) {
 export class User {
   userService: UserService;
 
-  @sdvx()
+  @generic()
   async sv6_save_c(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -106,7 +106,7 @@ export class User {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_save(ctx: Context): Promise<Serializable> {
     const playData = await this.userService.getPlayerData(ctx.token);
     if (!playData) {
@@ -168,7 +168,7 @@ export class User {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_new(ctx: Context): Promise<Serializable> {
     await this.userService.createEmptyPlayerData(ctx.token, ctx.body.name);
 
@@ -185,7 +185,7 @@ export class User {
     };
   }
 
-  @sdvx()
+  @generic()
   async sv6_load(ctx: Context): Promise<Serializable> {
     const playData = await this.userService.getPlayerData(ctx.token);
 
@@ -227,7 +227,7 @@ export class User {
     };
   }
 
-  @sdvx()
+  @generic()
   async getItemList(): Promise<Serializable> {
     return {
       status: v.s32(0),
@@ -242,43 +242,4 @@ export class User {
       }
     };
   }
-
-  @sdvx()
-  async getGoodsList(): Promise<Serializable> {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        goods_num: v.s32(0),
-      }
-    };
-  }
-
-  @sdvx()
-  async getUserIDs(ctx: Context): Promise<Serializable> {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        card_num: v.str(tokenToCardNumber(ctx.token)),
-        ref_id: v.str(tokenToHash(ctx.token)),
-        data_id: v.str(tokenToHash(ctx.token)),
-        sns_id: v.str(tokenToSnsId(ctx.token)),
-      }
-    };
-  }
-
-  @sdvx()
-  async getSubscriptionStatus(): Promise<Serializable> {
-    return {
-      status: v.s32(0),
-      error_code: v.s32(0),
-      response: {
-        subscription: {
-          name: v.str('eac_sdvx_basic'),
-        },
-      }
-    };
-  }
-
 }
