@@ -1,5 +1,4 @@
 import * as data from '../../datas/sdvx.js';
-import { tokenToCardNumber, tokenToHash, tokenToSnsId } from "../../utils/laochan-id.js";
 import { Context } from "../../types.js";
 import { generic } from '../../decorators/eacnet.js';
 import { KValueG, Serializable, ValueTypes, v } from '../../utils/kxml-value.js';

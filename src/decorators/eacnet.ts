@@ -7,6 +7,7 @@ export function eacnet(protocol_name: string, topName: string, dataOffset: numbe
       const orig = descriptor.value as Function;
       descriptor.value = async function (...args: any[]) {
         const obj = await orig.apply(this, args);
+
         const kxml = toKBinXml(topName, obj, encoding);
         const compressed = LZ77.compress(kxml.data);
         const result = Buffer.allocUnsafe(compressed.length + dataOffset);

@@ -1,8 +1,8 @@
-import { generic } from "../decorators/eacnet.js";
-import { Context } from "../types.js";
-import config from "../utils/config.js";
-import { Serializable, v } from "../utils/kxml-value.js";
-import { tokenToCardNumber, tokenToHash, tokenToSnsId } from "../utils/laochan-id.js";
+import { generic } from '../decorators/eacnet.js';
+import { Context } from '../types.js';
+import config from '../utils/config.js';
+import { Serializable, v } from '../utils/kxml-value.js';
+import { tokenToCardNumber, tokenToHash, tokenToSnsId } from '../utils/laochan-id.js';
 
 export class EacGeneric {
   @generic()
@@ -12,7 +12,7 @@ export class EacGeneric {
       error_code: v.s32(0),
       response: {
         goods_num: v.s32(0),
-      }
+      },
     };
   }
 
@@ -26,7 +26,7 @@ export class EacGeneric {
         ref_id: v.str(tokenToHash(ctx.token)),
         data_id: v.str(tokenToHash(ctx.token)),
         sns_id: v.str(tokenToSnsId(ctx.token)),
-      }
+      },
     };
   }
 
@@ -37,14 +37,14 @@ export class EacGeneric {
       error_code: v.s32(0),
       response: {
         subscription: {
-          name: v.str([
-            'eac_ddr_basic',
-            'EAC_POPNLIVELY',
-            'eac_sdvx_basic',
-            'eacgitadora_basic'
-          ]),
+          name: [
+            v.str('eac_ddr_basic'),
+            v.str('EAC_POPNLIVELY'),
+            v.str('eac_sdvx_basic'),
+            v.str('eacgitadora_basic'),
+          ],
         },
-      }
+      },
     };
   }
 
@@ -61,7 +61,7 @@ export class EacGeneric {
         mainte_end_clock: v.u64(0),
         usta_boot_status: v.s32(1),
         usta_time_remain: v.s32(0),
-      }
+      },
     };
   }
 
@@ -72,7 +72,7 @@ export class EacGeneric {
       error_code: v.s32(0),
       response: {
         permission: v.s32(1),
-      }
+      },
     };
   }
 
@@ -84,8 +84,8 @@ export class EacGeneric {
       error_code: v.s32(0),
       response: {
         server_clock: v.u64(new Date().valueOf()),
-      }
-    }
+      },
+    };
   }
 
   @generic()
@@ -97,8 +97,44 @@ export class EacGeneric {
         server_state: v.s32(1),
         mainte_start_clock: v.u64(0),
         mainte_end_clock: v.u64(0),
-      }
-    }
+      },
+    };
+  }
+
+  _transactionIdMap: Map<string, string> = new Map<string, string>();
+
+  @generic()
+  async reserveConsumeItem(ctx: Context): Promise<Serializable> {
+    const goodsId = ctx.body.goodsId as string;
+    const transactionId = (Math.random() * 10000000000).toString(16);
+
+    this._transactionIdMap.set(transactionId, goodsId);
+
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      response: {
+        transaction_id: v.str(transactionId),
+      },
+    };
+  }
+
+  @generic()
+  async consumeItem(ctx: Context): Promise<Serializable> {
+    const transactionId = ctx.body.transaction_id as string;
+    const goodsId = this._transactionIdMap.get(transactionId);
+
+    this._transactionIdMap.delete(transactionId);
+
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      response: {
+        item_id: v.str(goodsId),
+        free_count: v.s32(0),
+        not_free_count: v.s32(1919810),
+      },
+    };
   }
 
   @generic()
@@ -183,7 +219,7 @@ export class EacGeneric {
           },
 
         ],
-      }
+      },
     };
   }
 }

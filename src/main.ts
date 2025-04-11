@@ -62,8 +62,8 @@ async function main(): Promise<void> {
     .use(eacnet)
     .use(async (ctx, next) => {
       ctx.logger = ctx.service
-        ? register(`logger:${ctx.service.name}:${ctx.service.method}`, {
-          useValue: new Logger(`${ctx.service.name}:${ctx.service.method}`),
+        ? register(`logger:${ctx.service.name}:${ctx.service.module ? ctx.service.module + ':' : '' }${ctx.service.method}`, {
+          useValue: new Logger(`${ctx.service.name}:${ctx.service.module ? ctx.service.module + ':' : '' }${ctx.service.method}`),
         })
         : logger;
 

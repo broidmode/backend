@@ -40,12 +40,12 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
 
     ctx.service = {
       name: info.game_id,
-      module: info.module,
+      module: request.module,
       method: request.method,
     };
 
     ctx.body = request.data ?? {};
-    ctx.eacnetRequest = request;
+    ctx.eacnetRequest = request.service ? request : undefined;
     return next();
   }
 
