@@ -7,6 +7,7 @@ export function eacnet(protocol_name: string, topName: string, dataOffset: numbe
       const orig = descriptor.value as Function;
       descriptor.value = async function (...args: any[]) {
         const obj = await orig.apply(this, args);
+
         const kxml = toKBinXml(topName, obj, encoding);
         const compressed = LZ77.compress(kxml.data);
         const result = Buffer.allocUnsafe(compressed.length + dataOffset);
@@ -21,4 +22,4 @@ export function eacnet(protocol_name: string, topName: string, dataOffset: numbe
 }
 
 export const p2d = eacnet('P2D:2015091800', 'p2d', 0x2E);
-export const sdvx = eacnet('2020090800', 'eacnet', 0x2A);
+export const generic = eacnet('2020090800', 'eacnet', 0x2A);

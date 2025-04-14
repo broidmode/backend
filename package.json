@@ -1,7 +1,7 @@
 {
-  "name": "@laochan/ea3",
+  "name": "@laochan/eacloud",
   "version": "0.0.0",
-  "description": "Yet another e-amusement server emulator.",
+  "description": "EACloud server emulator.",
   "type": "module",
   "engines": {
     "node": ">= 20.9 < 21"

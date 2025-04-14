@@ -62,8 +62,8 @@ async function main(): Promise<void> {
     .use(eacnet)
     .use(async (ctx, next) => {
       ctx.logger = ctx.service
-        ? register(`logger:${ctx.service.name}:${ctx.service.method}`, {
-          useValue: new Logger(`${ctx.service.name}:${ctx.service.method}`),
+        ? register(`logger:${ctx.service.name}:${ctx.service.module ? ctx.service.module + ':' : '' }${ctx.service.method}`, {
+          useValue: new Logger(`${ctx.service.name}:${ctx.service.module ? ctx.service.module + ':' : '' }${ctx.service.method}`),
         })
         : logger;
 
@@ -126,11 +126,22 @@ async function main(): Promise<void> {
 
       let method = ctx.service.method;
 
-      if (!service || !(service[method])?.bind) {
-        ctx.logger.warn(`unimplemented method.`);
+      if (!service) {
+        ctx.logger.warn(`unimplemented service ${ctx.service.name}.`);
 
         service = container.resolve(DefaultService);
         method = 'default';
+      } else {
+        if (!(service[method])?.bind) {
+          method = ctx.service.module + '_' + ctx.service.method;
+
+          if (!(service[method])?.bind) {
+            ctx.logger.warn(`unimplemented method ${JSON.stringify(ctx.service)}.`);
+
+            service = container.resolve(DefaultService);
+            method = 'default';
+          }
+        }
       }
 
       ctx.body = await (service[method] as Function).bind(service)(ctx);

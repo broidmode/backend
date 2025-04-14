@@ -3,9 +3,7 @@ import { p2d } from "../../decorators/eacnet.js";
 import { UserService } from "../../services/p2d/user.js";
 import { Context } from "../../types.js";
 import { v } from "../../utils/kxml-value.js";
-import { MUSIC_LIST } from "./index.js";
 import { Binary } from "mongodb";
-import * as data from '../../datas/p2d.js'
 
 // user only needs to unlock omni music, which is temporary
 const userUnlockMusic = new Map<string, number>();
@@ -90,12 +88,10 @@ export class Music {
     const result = ctx.body as PlayerPlayLog;
     result.player = ctx.token;
 
-    let updateTask = Promise.resolve();
-
     const play_style = Math.floor(result.note_id / 5);
     const diff = result.note_id % 5;
 
-    updateTask = (async () => {
+    const updateTask = (async () => {
       const musicData = await this.userService.getMusicData(result.player, result.music_id, play_style);
 
       musicData.play_num[diff]++;
@@ -117,7 +113,7 @@ export class Music {
           musicData.clear_num[diff]++;
       }
 
-      this.userService.upsertMusicData(musicData);
+      await this.userService.upsertMusicData(musicData);
     })();
 
     // @ts-expect-error ghost is Buffer now, convert it to binary
@@ -148,24 +144,7 @@ export class Music {
   }
 
   @p2d()
-  async getMusicList(ctx: Context) {
-    let music = [...MUSIC_LIST];
-
-    if (userUnlockMusic.has(ctx.token)) {
-      const targetMusic = userUnlockMusic.get(ctx.token);
-      userUnlockMusic.delete(ctx.token);
-
-      const bitData = data.omni_musics.find(v => v.id === targetMusic);
-
-      music = music.filter(v => v.music_id['__value'] !== targetMusic);
-      music.push({
-        music_id: v.s32(bitData.id),
-        kind: v.s32(1),
-        note_bit: v.s32(bitData.noteBit),
-        music_pack_item_id: v.str(''),
-      });
-    }
-
+  async getMusicList() {
     return {
       status: v.s32(0),
       error: v.s32(0),
@@ -173,8 +152,7 @@ export class Music {
         status: v.s32(0),
         check_sum: v.str(''),
         music_list: {
-          music_num: v.s32(music.length),
-          music,
+          music_num: v.s32(0),
         }
       },
     };

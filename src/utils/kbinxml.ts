@@ -2,7 +2,6 @@ import { to_bin, to_xml } from "@kamyu/kbinxml";
 import { XMLParser } from "fast-xml-parser";
 import _ from "lodash";
 import { Serializable } from "./kxml-value.js";
-import { writeFileSync } from "fs";
 
 export const parser = new XMLParser({
   ignoreAttributes: false,
@@ -135,8 +134,22 @@ function serializeValue(value: any, type: string): string {
     return value.toString('hex');
   }
 
-  if (['ip4', 'str', 'string'].includes(type)) {
+  if (['ip4'].includes(type)) {
     return value;
+  }
+
+  if (['str', 'string'].includes(type)) {
+    return value.replace(/[<>&'"]/g, (ch: string) => {
+      switch (ch) {
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '&': return '&amp;';
+        case '\'': return '&apos;';
+        case '"': return '&quot;';
+      }
+
+      return ch;
+    });
   }
 
   if (type == 'time') {
@@ -228,6 +241,6 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
 
 export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8') {
   const xml = `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
-  writeFileSync('dump.xml', xml);
+  console.log(xml);
   return to_bin(xml);
 }

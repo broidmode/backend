@@ -7,6 +7,7 @@ export interface ILaochanContext {
 
   service: {
     name: string,
+    module: string,
     method: string,
   };
 
