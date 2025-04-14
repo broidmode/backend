@@ -1,10 +1,11 @@
 import { v } from '../utils/kxml-value.js';
+import { Serializable } from '../utils/kxml-value.js';
 
 const mainSoundInfos =
   [
     {
       mcode: v.u32(358),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzcvOS8zLzc5OWEzMGNjZTMyMmFkYzI4YjRmYmNiM2EwMWQ0MGVkZjY3ZDZkOGI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC83LzkvMy83OTlhMzBjY2UzMjJhZGMyOGI0ZmJjYjNhMDFkNDBlZGY2N2Q2ZDhi'),
       xsb_size: v.u64(330),
@@ -16,7 +17,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(470),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzkvOS80LzllOTU0Y2FlMzExYzA2OTNkNDU2MWNlNTA3NDc2MjBmYWUzMDVjODg='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMS85LzkvNC85ZTk1NGNhZTMxMWMwNjkzZDQ1NjFjZTUwNzQ3NjIwZmFlMzA1Yzg4'),
       xsb_size: v.u64(330),
@@ -28,7 +29,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(476),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzQvYi9jLzRmYmJjNmY1Y2U2ODhiOTNiOTIyZjg5M2ZhNzBhZmZhODdiMmI0NWY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC80L2IvYy80ZmJiYzZmNWNlNjg4YjkzYjkyMmY4OTNmYTcwYWZmYTg3YjJiNDVm'),
       xsb_size: v.u64(330),
@@ -40,7 +41,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37282),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzQvMS81LzQ5MTc1OGZhMmIzMWFkYTUxODhmNzI5Y2NiYmZjMzk0NTg4NGM5Mjg='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC80LzEvNS80OTE3NThmYTJiMzFhZGE1MTg4ZjcyOWNjYmJmYzM5NDU4ODRjOTI4'),
       xsb_size: v.u64(330),
@@ -52,7 +53,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37283),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzcvMi83Lzc0MjM3NjgxODM2NmYwOGMwMjRiYTE1MzczNjdiZjFhMGY2MzJiMGY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC83LzIvNy83NDIzNzY4MTgzNjZmMDhjMDI0YmExNTM3MzY3YmYxYTBmNjMyYjBm'),
       xsb_size: v.u64(330),
@@ -64,7 +65,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37472),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2IvNS9kL2JmNThkOWE2OWIzZjVjMzgwYzA3MTY3ZGY0NTcyNjA4ODg2Y2JlZWI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9iLzUvZC9iZjU4ZDlhNjliM2Y1YzM4MGMwNzE2N2RmNDU3MjYwODg4NmNiZWVi'),
       xsb_size: v.u64(330),
@@ -76,7 +77,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37513),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvNy81L2U4Nzc1YzM2YTBhZmY1ZjE3NWQ5NjUzMWQ1Y2E4NzFlMzEyZTdkZjE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9lLzcvNS9lODc3NWMzNmEwYWZmNWYxNzVkOTY1MzFkNWNhODcxZTMxMmU3ZGYx'),
       xsb_size: v.u64(330),
@@ -88,7 +89,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37607),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzQvYS84LzQ3YWI4ZWNlNzYyMzEzY2NmZjgxMmY2YjcwZjk2OWQyMjQwMzllMTI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjA1MTgwMC80L2EvOC80N2FiOGVjZTc2MjMxM2NjZmY4MTJmNmI3MGY5NjlkMjI0MDM5ZTEy'),
       xsb_size: v.u64(330),
@@ -100,7 +101,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37608),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2MvYy9kL2MwY2FkM2M0MWRhZmNiZmU0NmM0NmExMTFjMmFmZGVmNzczYzI5OTM='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMzA4MDgwMC9jL2MvZC9jMGNhZDNjNDFkYWZjYmZlNDZjNDZhMTExYzJhZmRlZjc3M2MyOTkz'),
       xsb_size: v.u64(330),
@@ -112,7 +113,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37609),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzEvNS8yLzEwNTcyMzA2YzUwN2Q2ZDlhNzIwNTEwNWUxOTc2ZTY2MmI1NmM4NTI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjEwMTkwMC8xLzUvMi8xMDU3MjMwNmM1MDdkNmQ5YTcyMDUxMDVlMTk3NmU2NjJiNTZjODUy'),
       xsb_size: v.u64(330),
@@ -124,7 +125,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37630),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzgvMi8zLzgwMmIzYzIwOTY5ZDJlZmNkODc3MjUyMDRlMGY3ZTFkNTU5ZmJhZTg='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMzAxMjUwMC84LzIvMy84MDJiM2MyMDk2OWQyZWZjZDg3NzI1MjA0ZTBmN2UxZDU1OWZiYWU4'),
       xsb_size: v.u64(330),
@@ -136,7 +137,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37654),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvNy9lLzU1NzllNjMxMzIzYTgyNzhmYTE2ZWQ1ZGUzZmY0ZDg1NjJkMTc2YWE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC81LzcvZS81NTc5ZTYzMTMyM2E4Mjc4ZmExNmVkNWRlM2ZmNGQ4NTYyZDE3NmFh'),
       xsb_size: v.u64(330),
@@ -148,7 +149,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37805),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2MvNi9hL2M1NmRhMzVjYjA0MDFhNDFmNjFjZTNkMDIxNDhmMjk0MzZmMDI0OWI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9jLzYvYS9jNTZkYTM1Y2IwNDAxYTQxZjYxY2UzZDAyMTQ4ZjI5NDM2ZjAyNDli'),
       xsb_size: v.u64(330),
@@ -160,7 +161,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37871),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzkvOS9iLzkwOWFiZWMwOWJmMGVmNDcyMWZmMTViMjAyODA5OGI3MmVlYzBmYzY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC85LzkvYi85MDlhYmVjMDliZjBlZjQ3MjFmZjE1YjIwMjgwOThiNzJlZWMwZmM2'),
       xsb_size: v.u64(330),
@@ -172,7 +173,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37891),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2YvMi8zL2ZjMjUzNDMxNGYxOTE1ZjM0MWI5ZmU2YWM0NTU0MTkwOWY5YzRiMjE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9mLzIvMy9mYzI1MzQzMTRmMTkxNWYzNDFiOWZlNmFjNDU1NDE5MDlmOWM0YjIx'),
       xsb_size: v.u64(330),
@@ -184,7 +185,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37892),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2YvMC8xL2Y4MDcxMWE2YWI1ZTIxYzI3ZWE3MDBkOWZkMzExNzNlMzJmZGI2Nzk='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9mLzAvMS9mODA3MTFhNmFiNWUyMWMyN2VhNzAwZDlmZDMxMTczZTMyZmRiNjc5'),
       xsb_size: v.u64(330),
@@ -196,7 +197,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37894),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzIvNi8xLzI3NmMxZWE1ODk5MzQ0ZTQ5MWQ0ZmUxMDhlNmIxOTk5ZjE5YWVkNDI='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC8yLzYvMS8yNzZjMWVhNTg5OTM0NGU0OTFkNGZlMTA4ZTZiMTk5OWYxOWFlZDQy'),
       xsb_size: v.u64(330),
@@ -208,7 +209,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37897),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2IvYi8zL2IyYmMzZTg4YjZhMDc5NzFjMGNjMWVlZDcxYjgyYjg4ZTI3ODBhMTU='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9iL2IvMy9iMmJjM2U4OGI2YTA3OTcxYzBjYzFlZWQ3MWI4MmI4OGUyNzgwYTE1'),
       xsb_size: v.u64(330),
@@ -220,7 +221,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37898),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvZS9hL2UxZTNhNzllMmRiNWEzYTI4ZWI5MzY5ZmM0ZjUyMjBkOWM3MjIwY2Y='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9lL2UvYS9lMWUzYTc5ZTJkYjVhM2EyOGViOTM2OWZjNGY1MjIwZDljNzIyMGNm'),
       xsb_size: v.u64(330),
@@ -232,7 +233,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37922),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzgvMi9kLzgwMjFkMTkyYmRlZTUxZDU2N2JhZjEwYjlhYTJmZWQxMzNmNDUzYzQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC84LzIvZC84MDIxZDE5MmJkZWU1MWQ1NjdiYWYxMGI5YWEyZmVkMTMzZjQ1M2M0'),
       xsb_size: v.u64(332),
@@ -244,7 +245,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37923),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvOC82L2VhODE2MDcyZjE2Y2JlOWY0ZDdjYmJhM2YzNTFmZDYzZjMzYjc4YTc='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9lLzgvNi9lYTgxNjA3MmYxNmNiZTlmNGQ3Y2JiYTNmMzUxZmQ2M2YzM2I3OGE3'),
       xsb_size: v.u64(330),
@@ -256,7 +257,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37928),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvNS9kL2UxNWJkMjUwMDBjNzM4MmRjMmI5MjdjMTkyMDZiYWZkZTZmZTI2OTg='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9lLzUvZC9lMTViZDI1MDAwYzczODJkYzJiOTI3YzE5MjA2YmFmZGU2ZmUyNjk4'),
       xsb_size: v.u64(330),
@@ -268,7 +269,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(37935),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzAvYy84LzBiY2M4OTIwMDVmM2ZhY2NlNTNlMzljMmQ3NzU0NzE5MDlhMzcyMjM='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC8wL2MvOC8wYmNjODkyMDA1ZjNmYWNjZTUzZTM5YzJkNzc1NDcxOTA5YTM3MjIz'),
       xsb_size: v.u64(330),
@@ -280,7 +281,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38121),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzkvMi9jLzlkMmRjNjkwZWNhMzgzYTZmMmEzMTI2YzU1ZDE5YzRhYzU0MTg4NTc='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC85LzIvYy85ZDJkYzY5MGVjYTM4M2E2ZjJhMzEyNmM1NWQxOWM0YWM1NDE4ODU3'),
       xsb_size: v.u64(330),
@@ -292,7 +293,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38152),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvOS85LzUwOTA5MzYwNWI2NzI0MGU1OTgzNjdhOTBmNjdhMjAzYjNlMGNjN2E='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC81LzkvOS81MDkwOTM2MDViNjcyNDBlNTk4MzY3YTkwZjY3YTIwM2IzZTBjYzdh'),
       xsb_size: v.u64(330),
@@ -304,7 +305,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38469),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2YvZi9mL2YwZjJmMDkyZTNiZjFjYjY3NTdjZDQ0YzIyYjk1MjRjMzE1YWZhYjE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9mL2YvZi9mMGYyZjA5MmUzYmYxY2I2NzU3Y2Q0NGMyMmI5NTI0YzMxNWFmYWIx'),
       xsb_size: v.u64(330),
@@ -316,7 +317,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38470),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvMy8wL2VlMzMwMzg2YTcyNWNkNTFkOWI5OTkyMDM4Njg5MTIzMzU1Y2QyNTA='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9lLzMvMC9lZTMzMDM4NmE3MjVjZDUxZDliOTk5MjAzODY4OTEyMzM1NWNkMjUw'),
       xsb_size: v.u64(330),
@@ -328,7 +329,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38471),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2EvYi80L2E4YmY0Y2VmNjZkNmYxOTYxNWY2ZjQ2YWFiNjk0ZDcxZjI3YmQ4MGM='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC9hL2IvNC9hOGJmNGNlZjY2ZDZmMTk2MTVmNmY0NmFhYjY5NGQ3MWYyN2JkODBj'),
       xsb_size: v.u64(330),
@@ -340,7 +341,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38472),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzMvMy80LzMzMzE0Yjk1OGU3YTVmOWFhNmQ5ODMzOWFjZGViMGRhOWE0NGE0OTA='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC8zLzMvNC8zMzMxNGI5NThlN2E1ZjlhYTZkOTgzMzlhY2RlYjBkYTlhNDRhNDkw'),
       xsb_size: v.u64(330),
@@ -352,7 +353,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38473),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzcvYS82LzdhYWI2MTMxMDJlM2M4Njc5ZWI4ZjYwMDcwNjZhZjY5MDRhZWEwOWQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC83L2EvNi83YWFiNjEzMTAyZTNjODY3OWViOGY2MDA3MDY2YWY2OTA0YWVhMDlk'),
       xsb_size: v.u64(330),
@@ -364,7 +365,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38474),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvMy9iLzViM2JiZDc1YjY2MjhlZjg2M2JjMzNkYzQ4ZWFiZmY0NGE2NjFiMWY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTExMDgwMC81LzMvYi81YjNiYmQ3NWI2NjI4ZWY4NjNiYzMzZGM0OGVhYmZmNDRhNjYxYjFm'),
       xsb_size: v.u64(330),
@@ -376,7 +377,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38476),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2EvNy8yL2E0N2QyMzEzYmUwNzYxN2E1ZTc2MmNjZWFlM2Q0MDllMmE0Y2E1NDE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC9hLzcvMi9hNDdkMjMxM2JlMDc2MTdhNWU3NjJjY2VhZTNkNDA5ZTJhNGNhNTQx'),
       xsb_size: v.u64(330),
@@ -388,7 +389,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38477),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2EvOC8wL2FjOGQwNmExYTdjNWI0YzBhODBhOTlkMGZhZmJlYjRmMzM5ZGI2NGE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC9hLzgvMC9hYzhkMDZhMWE3YzViNGMwYTgwYTk5ZDBmYWZiZWI0ZjMzOWRiNjRh'),
       xsb_size: v.u64(330),
@@ -400,7 +401,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38478),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2QvYS9kL2Q3YWJkNzgzMjU0ZDRmOTRiZTFjYTY4OGE5ODYxZDA2MTYwYzY1ZTQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC9kL2EvZC9kN2FiZDc4MzI1NGQ0Zjk0YmUxY2E2ODhhOTg2MWQwNjE2MGM2NWU0'),
       xsb_size: v.u64(330),
@@ -412,7 +413,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38479),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzQvMy85LzQzMzk5MjAxZWJmNjcxZDNjMjhlMGExMmU2NmU3NmM0YmY3MGRmYTM='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC80LzMvOS80MzM5OTIwMWViZjY3MWQzYzI4ZTBhMTJlNjZlNzZjNGJmNzBkZmEz'),
       xsb_size: v.u64(330),
@@ -424,7 +425,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38480),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzYvZC8yLzZmZGMyMTEyZjNmYmM1OWI2NDlmYzhjOTc3YjVmZTExODc4MjdlODQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC82L2QvMi82ZmRjMjExMmYzZmJjNTliNjQ5ZmM4Yzk3N2I1ZmUxMTg3ODI3ZTg0'),
       xsb_size: v.u64(330),
@@ -436,7 +437,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38482),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvNS8wL2U2NTgwNWQyMmVjZTZkZjQ5Yjg2OGNjYjYyYTgyYTMxNzhiNjAwN2E='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC9lLzUvMC9lNjU4MDVkMjJlY2U2ZGY0OWI4NjhjY2I2MmE4MmEzMTc4YjYwMDdh'),
       xsb_size: v.u64(330),
@@ -448,7 +449,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38483),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvYy9hLzVlYzRhNmY5NzM3M2JlZWZkN2Q2NmEzNjYwOGNlZWM5NzkwZTg4MGU='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMTEyMTUwMC81L2MvYS81ZWM0YTZmOTczNzNiZWVmZDdkNjZhMzY2MDhjZWVjOTc5MGU4ODBl'),
       xsb_size: v.u64(330),
@@ -460,7 +461,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38498),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvYi82LzUxYmY2MDVmNTc0YWFhNDg4NGQ4MjkzYTY3ZTNkNGUxZTgwN2RlMmE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjAyMjgwMC81L2IvNi81MWJmNjA1ZjU3NGFhYTQ4ODRkODI5M2E2N2UzZDRlMWU4MDdkZTJh'),
       xsb_size: v.u64(330),
@@ -472,7 +473,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38499),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvOC85LzU3OGE5OTQ4ZDA2NmE5MDc5ZDlmZmVlZDBlZmViNWU0ODNkMWMxMzg='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjAyMjgwMC81LzgvOS81NzhhOTk0OGQwNjZhOTA3OWQ5ZmZlZWQwZWZlYjVlNDgzZDFjMTM4'),
       xsb_size: v.u64(330),
@@ -484,7 +485,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38500),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2EvZS81L2EzZTk1YTIyZWY2NDk3NzU1ZDVkY2RiMmQ5NzI5MTU5M2M4YWFiNmU='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjA1MTgwMC9hL2UvNS9hM2U5NWEyMmVmNjQ5Nzc1NWQ1ZGNkYjJkOTcyOTE1OTNjOGFhYjZl'),
       xsb_size: v.u64(330),
@@ -496,7 +497,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38503),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2UvMC9lL2U4MGFlMDdmNWM1NWIxMGFhMDBkMmM4MzY2YjA4ZjBiNDk2MzYzOTQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjAyMjgwMC9lLzAvZS9lODBhZTA3ZjVjNTViMTBhYTAwZDJjODM2NmIwOGYwYjQ5NjM2Mzk0'),
       xsb_size: v.u64(332),
@@ -508,7 +509,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38504),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzUvYi83LzUxYjE3MTQ2OWI4N2Q1MmE0NDgwNGFjZWJlMzdkN2FiZDIyNDkwZjE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjAyMjgwMC81L2IvNy81MWIxNzE0NjliODdkNTJhNDQ4MDRhY2ViZTM3ZDdhYmQyMjQ5MGYx'),
       xsb_size: v.u64(332),
@@ -520,7 +521,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38505),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2IvNi80L2I3NjY0ZWM4NTQyYjRlYjhkOWEyN2JkMDNjMzdmZDk3OTQ0Y2M4NDA='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjAyMjgwMC9iLzYvNC9iNzY2NGVjODU0MmI0ZWI4ZDlhMjdiZDAzYzM3ZmQ5Nzk0NGNjODQw'),
       xsb_size: v.u64(332),
@@ -532,7 +533,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38549),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzIvZC85LzI5ZDI5Zjg4NjIyY2ZkMjFmNDNmYTNmMTkzMDMxMTkzNTZlYmU2N2Y='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjA3MjAwMC8yL2QvOS8yOWQyOWY4ODYyMmNmZDIxZjQzZmEzZjE5MzAzMTE5MzU2ZWJlNjdm'),
       xsb_size: v.u64(330),
@@ -544,7 +545,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38550),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2MvOC9mL2NmODZmOTRiMTE4MTRlNTc3YmU4N2IyNmMxMGVjOGYxNzE3OWRlNWY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjA4MDkwMC9jLzgvZi9jZjg2Zjk0YjExODE0ZTU3N2JlODdiMjZjMTBlYzhmMTcxNzlkZTVm'),
       xsb_size: v.u64(330),
@@ -556,7 +557,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38551),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzYvNS9iLzY0NTNiMmZhYjIwOTI0MWZlNDVlYjdlZWM4ZmQzYTE4MjFmZjAzMzE='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjA5MDcwMC82LzUvYi82NDUzYjJmYWIyMDkyNDFmZTQ1ZWI3ZWVjOGZkM2ExODIxZmYwMzMx'),
       xsb_size: v.u64(330),
@@ -568,7 +569,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38566),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2IvMS8wL2I4MWUwMjllY2M4ODgxZjUzYTM1YWNhZTlmZDI2NjZhOWYxODlkMTM='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjEwMTkwMC9iLzEvMC9iODFlMDI5ZWNjODg4MWY1M2EzNWFjYWU5ZmQyNjY2YTlmMTg5ZDEz'),
       xsb_size: v.u64(330),
@@ -580,7 +581,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38567),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2MvZi9kL2M3ZjNkN2U4ZjUwNmE1MzhjZjZhY2U5YmU3ZTQxMDQxMDdlZWQ2MjY='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMjEwMTkwMC9jL2YvZC9jN2YzZDdlOGY1MDZhNTM4Y2Y2YWNlOWJlN2U0MTA0MTA3ZWVkNjI2'),
       xsb_size: v.u64(330),
@@ -592,7 +593,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38588),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('L2EvYS9hL2ExYWVhOTgxYWZjNTYwMzljNjQwN2JjM2VhZDViN2Y2ZGNhY2Q5MGQ='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyNDA5MTcwMC9hL2EvYS9hMWFlYTk4MWFmYzU2MDM5YzY0MDdiYzNlYWQ1YjdmNmRjYWNkOTBk'),
       xsb_size: v.u64(330),
@@ -604,7 +605,7 @@ const mainSoundInfos =
     },
     {
       mcode: v.u32(38590),
-      is_save: v.bool(0),
+      is_save: v.bool(false),
       xsb_path: v.str('LzEvOC81LzFhODY1MzU2MDFhOTRiZjkwODQyNzY5ZWE2YTQwNDJiNGJjOGYyNTA='),
       xsb_url: v.str('aHR0cHM6Ly9kMmVsMGRsaTlsMHgycC5jbG91ZGZyb250Lm5ldC9zdHJtbmcvMjAyMzAzMTUwMC8xLzgvNS8xYTg2NTM1NjAxYTk0YmY5MDg0Mjc2OWVhNmE0MDQyYjRiYzhmMjUw'),
       xsb_size: v.u64(330),
@@ -618,7 +619,7 @@ const mainSoundInfos =
 
 export const mainSoundInfoMap = new Map<number, Serializable>();
 for(const info of mainSoundInfos) {
-  mainSoundInfoMap.set(info.mcode.__value, info);
+  mainSoundInfoMap.set(info.mcode.__value as number, info);
 }
 
 export const previewSoundInfos = [
@@ -21110,9 +21111,10 @@ for (const music of musics) {
   if (!music.music_pack_no?.__value)
     continue;
 
-  const pack = _musicPacks[music.music_pack_no.__value] ?? [];
+  const mpackId = music.music_pack_no.__value as number;
+  const pack = _musicPacks[mpackId] ?? [];
   pack.push(music.mcode.__value);
-  _musicPacks[music.music_pack_no.__value] = pack;
+  _musicPacks[mpackId] = pack;
 }
 
 export const mpacks = Object.keys(_musicPacks)
