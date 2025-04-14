@@ -52,14 +52,14 @@ export class UserService {
       data.notes.push([0, 0, 0, 0, 0]);
     }
 
-    let [playCount, rank, clearKind, score, unk] = data.notes[record.notetype];
+    let [playCount, rank, clearKind, score] = data.notes[record.notetype];
 
     playCount++;
     rank = Math.max(record.rank, rank);
     clearKind = Math.max(record.clearkind, clearKind);
     score = Math.max(record.score, score);
 
-    data.notes[record.notetype] = [playCount, rank, clearKind, score, unk];
+    data.notes[record.notetype] = [playCount, rank, clearKind, score, 0];
 
     await this.playerMusicCol.updateOne({ player, mcode: record.mcode }, { $set: data }, { upsert: true });
   }
