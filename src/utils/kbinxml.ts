@@ -1,4 +1,4 @@
-import { to_bin, to_xml } from "@kamyu/kbinxml";
+import { to_bin, to_xml } from "@geekidos/kbinxml";
 import { XMLParser } from "fast-xml-parser";
 import _ from "lodash";
 import { Serializable } from "./kxml-value.js";
@@ -8,6 +8,7 @@ export const parser = new XMLParser({
   parseAttributeValue: false,
   attributeNamePrefix: '$',
   removeNSPrefix: true,
+  textNodeName: '__value',
   numberParseOptions: {
     hex: false,
     leadingZeros: false,
@@ -32,49 +33,49 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
     ].includes(node.$__type)
   ) {
     if (isArray) {
-      return node['#text'].split(' ').map((v) => parseInt(v));
+      return node['__value'].split(' ').map((v) => parseInt(v));
     }
 
-    return parseInt(node['#text']);
+    return parseInt(node['__value']);
   }
 
   if (['float', 'double'].includes(node.$__type)) {
     if (isArray) {
-      return node['#text'].split(' ').map((v) => parseFloat(v));
+      return node['__value'].split(' ').map((v) => parseFloat(v));
     }
 
-    return parseFloat(node['#text']);
+    return parseFloat(node['__value']);
   }
 
   if (['b', 'bool'].includes(node.$__type)) {
-    return !!parseInt(node['#text']);
+    return !!parseInt(node['__value']);
   }
 
   if (['bin', 'binary'].includes(node.$__type)) {
-    return Buffer.from(node['#text'], 'hex');
+    return Buffer.from(node['__value'], 'hex');
   }
 
   if (['ip4', 'str', 'string'].includes(node.$__type)) {
-    return node['#text'];
+    return node['__value'];
   }
 
   if (node.$__type == 'time') {
-    return new Date(parseInt(node['#text']) * 1000);
+    return new Date(parseInt(node['__value']) * 1000);
   }
 
   return {
     type: node.$__type,
-    value: node['#text'],
+    value: node['__value'],
   };
 }
 
-export function toObject(node: Record<string, unknown> | unknown[] | string): any {
+export function toObject<T = any>(node: Record<string, unknown> | unknown[] | string): T {
   if (node instanceof Array) {
-    return node.map((v) => toObject(v as Record<string, unknown>));
+    return node.map((v) => toObject(v as Record<string, unknown>)) as T;
   }
 
   if (typeof node === 'string') {
-    return {};
+    return {} as T;
   }
 
   if ('$__type' in node) {
@@ -95,13 +96,17 @@ export function toObject(node: Record<string, unknown> | unknown[] | string): an
     obj[key] = toObject(node[key] as Record<string, unknown>);
   }
 
-  return obj;
+  return obj as T;
 }
 
-export function fromKBinXml(kbinxml: Uint8Array) {
-  const xml = to_xml(kbinxml).data;
-  const parsedXml = parser.parse(xml);
-  return toObject(parsedXml);
+export function fromKBinXml(kbinxml: Uint8Array, dumpXml: boolean = false) {
+  const xml = to_xml(kbinxml, true).data;
+
+  if (dumpXml) {
+    console.log(xml);
+  }
+
+  return parser.parse(xml);
 }
 
 function serializeValue(value: any, type: string): string {
@@ -239,8 +244,12 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
   return output + `</${name}>\n`;
 }
 
-export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8') {
+export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8', dumpXml: boolean = false) {
   const xml = `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
-  console.log(xml);
+
+  if (dumpXml) {
+    console.log(xml);
+  }
+
   return to_bin(xml);
 }

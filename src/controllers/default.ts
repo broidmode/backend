@@ -25,11 +25,11 @@ export class DefaultService {
       };
 
       // handle ac relay
-      if (ctx.eacnetRequest) {
+      if (ctx.acRelayInfo) {
         result['xrpc_status_code'] = v.s32(0);
         result['xrpc_fault_code'] = v.s32(0);
         result['response'] = {
-          [ctx.eacnetRequest.module]: {
+          [ctx.acRelayInfo.module]: {
             $status: 0,
           }
         }

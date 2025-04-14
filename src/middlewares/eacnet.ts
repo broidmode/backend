@@ -1,7 +1,7 @@
 import { Next } from 'koa';
 import { Context } from '../types.js';
 import { LZ77 } from '../utils/lz77.js';
-import { fromKBinXml } from '../utils/kbinxml.js';
+import { fromKBinXml, toObject } from '../utils/kbinxml.js';
 
 export async function eacnet(ctx: Context, next: Next): Promise<any> {
   const body = ctx.request.body as {
@@ -27,7 +27,8 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
   );
 
   const decoded = LZ77.decompress(buffer);
-  const result = fromKBinXml(decoded);
+  const xml = fromKBinXml(decoded);
+  const result = toObject(xml);
 
   if (result['eacnet']) {
     const info = result['eacnet'].info;
@@ -45,7 +46,12 @@ export async function eacnet(ctx: Context, next: Next): Promise<any> {
     };
 
     ctx.body = request.data ?? {};
-    ctx.eacnetRequest = request.service ? request : undefined;
+    ctx.acRelayInfo = request.service ? {
+      module: request.module,
+      method: request.method,
+      request: xml['eacnet']['request']['data'],
+    } : undefined;
+
     return next();
   }
 

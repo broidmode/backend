@@ -1,6 +1,13 @@
 import { Logger } from '@cordisjs/logger';
 import { DefaultState, ParameterizedContext } from 'koa';
 import { InjectionToken } from 'tsyringe';
+import { Serializable } from './utils/kxml-value.js';
+
+export interface AcRelayInfo {
+  module: string;
+  method: string;
+  request: Serializable;
+}
 
 export interface ILaochanContext {
   token?: string;
@@ -11,12 +18,7 @@ export interface ILaochanContext {
     method: string,
   };
 
-  eacnetRequest?: {
-    service: string;
-    module: string;
-    method: string;
-    data: unknown;
-  };
+  acRelayInfo?: AcRelayInfo;
 
   logger: Logger;
   body?: unknown;
