@@ -17,6 +17,17 @@ export const parser = new XMLParser({
   },
 });
 
+// TODO: maybe have a better way to workaround this.
+const ALWAYS_BIGINT_FOR_64BIT_NUMBER = true;
+function process64BitInteger(v: string) {
+  const bi = BigInt(v);
+  if (ALWAYS_BIGINT_FOR_64BIT_NUMBER || bi < Number.MIN_SAFE_INTEGER || bi > Number.MAX_SAFE_INTEGER) {
+    return bi;
+  }
+
+  return Number(bi);
+}
+
 function parseValue(node: { $__type: string; $__count?: unknown }): any {
   const isArray = '$__count' in node;
 
@@ -28,8 +39,6 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
       'u16',
       's32',
       'u32',
-      's64',
-      'u64',
     ].includes(node.$__type)
   ) {
     if (isArray) {
@@ -37,6 +46,20 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
     }
 
     return parseInt(node['__value']);
+  }
+
+  // javascript Number can't support 64bit data
+  if (
+    [
+      's64',
+      'u64',
+    ].includes(node.$__type)
+  ) {
+    if (isArray) {
+      return node['__value'].split(' ').map(process64BitInteger);
+    }
+
+    return process64BitInteger(node['__value']);
   }
 
   if (['float', 'double'].includes(node.$__type)) {
@@ -159,7 +182,7 @@ function serializeValue(value: any, type: string): string {
 
   if (type == 'time') {
     if (value instanceof Date) {
-      return Math.floor(value.valueOf() / 1000).toString();
+      return Math.floor(value.valueOf()).toString();
     }
 
     if (typeof value === 'number') {

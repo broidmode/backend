@@ -17,7 +17,7 @@ export class DefaultService {
 
       p2d()(undefined, undefined, descriptor);
       return descriptor.value();
-    } else if (['sdvx', 'ddr'].includes(ctx.service.name)) {
+    } else if (['sdvx', 'ddr', 'gitadora'].includes(ctx.service.name)) {
       const result = {
         status: v.s32(0),
         error_code: v.s32(0),
