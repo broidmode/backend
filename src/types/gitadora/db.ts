@@ -22,7 +22,10 @@ export interface GameSave {
 
 export interface PlayerData {
   _id: string;
-  gameSave: Record<'gf' | 'dm', GameSave>;
+  gameSave: {
+    [type: string]: GameSave
+  };
+  secretMusics: number[];
 }
 
 export interface MusicData {
@@ -33,7 +36,7 @@ export interface MusicData {
     clear: boolean;
     fullcombo: boolean;
     excellent: boolean;
-    score: number;
+    skill: number;
     perc: number;
     rank: number;
     meter: bigint;

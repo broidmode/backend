@@ -1,5 +1,6 @@
 import { LZ77 } from '../utils/lz77.js';
 import { toKBinXml } from '../utils/kbinxml.js';
+import config from '../utils/config.js';
 
 export function eacnet(protocol_name: string, topName: string, dataOffset: number) {
   return (encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8') => {
@@ -8,7 +9,7 @@ export function eacnet(protocol_name: string, topName: string, dataOffset: numbe
       descriptor.value = async function (...args: any[]) {
         const obj = await orig.apply(this, args);
 
-        const kxml = toKBinXml(topName, obj, encoding);
+        const kxml = toKBinXml(topName, obj, encoding, config.isDev);
         const compressed = LZ77.compress(kxml.data);
         const result = Buffer.allocUnsafe(compressed.length + dataOffset);
 

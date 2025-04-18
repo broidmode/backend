@@ -118,6 +118,8 @@ async function main(): Promise<void> {
             return '<ITEM>';
           } else if (key == 'param') {
             return '<PARAM>';
+          } else if (typeof value === 'bigint') {
+            return value.toString();
           }
 
           return value;

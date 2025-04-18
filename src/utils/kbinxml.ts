@@ -2,6 +2,7 @@ import { to_bin, to_xml } from "@geekidos/kbinxml";
 import { XMLParser } from "fast-xml-parser";
 import _ from "lodash";
 import { Serializable } from "./kxml-value.js";
+import { writeFileSync } from "fs";
 
 export const parser = new XMLParser({
   ignoreAttributes: false,
@@ -215,7 +216,7 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
   }
 
   // the kbinxml library had issue when serializing non-ordered stuff
-  attrs.sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
+  // attrs.sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
 
   for (const attr of attrs) {
     if (attr[1] === undefined)
@@ -224,9 +225,9 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
     output += ` ${attr[0]}="${_.escape(attr[1])}"`;
   }
 
-  output += '>';
-
   if (value) {
+    output += '>';
+
     if (value[1] === undefined) {
       return '';
     }
@@ -243,11 +244,11 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
       .join(' ');
   } else {
     const elements = entries
-      .filter(v => !v[0].startsWith('$'))
-      .sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
+      .filter(v => !v[0].startsWith('$'));
+      // .sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
 
     if (elements.length) {
-      output += '\n';
+      output += '>\n';
 
       for (const element of elements) {
         if (element[1] instanceof Array) {
@@ -261,6 +262,8 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
       }
 
       output += linePrefix;
+    } else {
+      return output + ' />\n';
     }
   }
 
@@ -268,11 +271,16 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
 }
 
 export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8', dumpXml: boolean = false) {
-  const xml = `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
+  const xml = `<?xml version="1.0" encoding="${encoding}"?>\n` + serializeObject(obj, topName);
 
   if (dumpXml) {
     console.log(xml);
   }
 
-  return to_bin(xml);
+  const bin = to_bin(xml);
+  if (dumpXml) {
+    writeFileSync('dump.bin', Buffer.from(bin.data));
+  }
+
+  return bin;
 }

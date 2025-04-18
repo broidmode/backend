@@ -124,7 +124,8 @@ export class UserService {
   async findPlayer(token: string): Promise<PlayerData> {
     const player = await this.playerDataCol.findOne({ _id: token }) ?? {
       _id: token,
-      gameSave: {}
+      gameSave: {},
+      secretMusics: [],
     } as PlayerData;
 
     if (!player.gameSave.gf) {
@@ -159,6 +160,7 @@ export class UserService {
       }, { useBigInt64: true }) ?? {
         player: token,
         musicId: stage.musicid,
+        seqs: {},
       } as MusicData)(),
       this.playRecordCol(type).insertOne({
         player: token,
@@ -167,18 +169,6 @@ export class UserService {
     ]);
 
     if (stage.seq in data.seqs) {
-      data.seqs[stage.seq] = {
-        fullcombo: stage.fullcombo,
-        excellent: stage.excellent,
-        clear: stage.clear,
-        score: stage.score,
-        perc: stage.perc,
-        rank: stage.rank,
-        meter: stage.meter,
-        meterProgress: stage.meter_prog,
-        bestRecord: result.insertedId,
-      }
-    } else {
       const seqData = data.seqs[stage.seq];
 
       seqData.fullcombo = seqData.fullcombo || stage.fullcombo;
@@ -191,16 +181,28 @@ export class UserService {
       }
 
       seqData.rank = Math.max(seqData.rank, stage.rank);
-      seqData.score = Math.max(seqData.score, stage.score);
+      seqData.skill = Math.max(seqData.skill, stage.score);
 
       if (stage.meter_prog > seqData.meterProgress) {
         seqData.meterProgress = stage.meter_prog;
         seqData.meter = stage.meter;
       }
+    } else {
+      data.seqs[stage.seq] = {
+        fullcombo: stage.fullcombo,
+        excellent: stage.excellent,
+        clear: stage.clear,
+        skill: stage.skill,
+        perc: stage.perc,
+        rank: stage.rank,
+        meter: stage.meter,
+        meterProgress: stage.meter_prog,
+        bestRecord: result.insertedId,
+      }
     }
 
     await this.musicDataCol(type).updateOne({ player: token, musicId: stage.musicid }, {
       $set: data,
-    }, { useBigInt64: true });
+    }, { useBigInt64: true, upsert: true });
   }
 }
