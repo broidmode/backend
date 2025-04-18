@@ -1,16 +1,20 @@
-import { singleton } from "tsyringe";
+import { inject, singleton } from "tsyringe";
 import { Combine } from "../../utils/combine.js";
 import { EacGeneric } from "../eac-generic.js";
 import { User } from "./user.js";
 import { generic } from "../../decorators/eacnet.js";
 import { Serializable, v } from "../../utils/kxml-value.js";
 import { event, musicinfo } from "../../datas/gitadora.js";
+import { UserService } from "../../services/gitadora/user.js";
 
 @singleton()
 export default class extends Combine(EacGeneric, User) {
-  constructor() {
+  constructor(
+    @inject(UserService) private readonly userService: UserService,
+  ) {
     super();
 
+    this.userService;
   }
 
   @generic()

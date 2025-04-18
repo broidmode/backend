@@ -18,7 +18,7 @@ export const parser = new XMLParser({
 });
 
 // TODO: maybe have a better way to workaround this.
-const ALWAYS_BIGINT_FOR_64BIT_NUMBER = true;
+const ALWAYS_BIGINT_FOR_64BIT_NUMBER = false;
 function process64BitInteger(v: string) {
   const bi = BigInt(v);
   if (ALWAYS_BIGINT_FOR_64BIT_NUMBER || bi < Number.MIN_SAFE_INTEGER || bi > Number.MAX_SAFE_INTEGER) {
@@ -83,7 +83,7 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
   }
 
   if (node.$__type == 'time') {
-    return new Date(parseInt(node['__value']) * 1000);
+    return new Date(parseInt(node['__value']));
   }
 
   return {
