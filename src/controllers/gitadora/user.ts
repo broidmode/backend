@@ -180,6 +180,7 @@ export class User {
                 ];
                 const meter = new Array(8).fill(0);
                 const meterProg = new Array(8).fill(0);
+                const flags = new Array(4).fill(0);
 
                 for (const seq in m.seqs) {
                   const rec = m.seqs[seq];
@@ -192,11 +193,23 @@ export class User {
                   mdata[8 + (+seq)] = rec.rank;
                   meter[+seq] = rec.meter;
                   meterProg[+seq] = rec.meterProgress;
+
+                  if (rec.fullcombo) {
+                    flags[0] |= 1 << +seq;
+                  }
+
+                  if (rec.excellent) {
+                    flags[1] |= 1 << +seq;
+                  }
+
+                  if (rec.clear) {
+                    flags[2] |= 1 << +seq;
+                  }
                 }
 
                 return {
                   $musicid: m.musicId,
-                  flag: v.u16([0, 0, 0, 0]),
+                  flag: v.u16(flags),
                   sdata: v.s16([bestSeq, bestScore]),
                   mdata: v.s16(mdata),
                   meter: v.u64(meter),
