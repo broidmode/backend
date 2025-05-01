@@ -6,6 +6,7 @@ import { requestEa3 } from "../../utils/ea3.js";
 import { SDVX_AC_MODEL } from "./index.js";
 import { tokenToCardNumber } from '../../utils/laochan-id.js';
 import { cache } from '../../decorators/cache.js';
+import { writeFileSync } from "fs";
 
 export class AcRelay {
   @generic()
@@ -38,8 +39,21 @@ export class AcRelay {
   }
 
   @cache('sv6_common')
+  @generic()
   async sv6_common(ctx: Context): Promise<Serializable> {
-    return this.acRelayCommon(ctx);
+    const { status, response } = await requestEa3(ctx.acRelayInfo, SDVX_AC_MODEL, ctx.token);
+
+    // remove notice from response
+    response['game']['extend']['info'] = response['game']['extend']['info']
+      .filter(v => v['extend_id'].__value !== "1");
+
+    return {
+      status: v.s32(0),
+      error_code: v.s32(0),
+      xrpc_status_code: v.s32(status),
+      xrpc_fault_code: v.s32(status),
+      response,
+    };
   }
 
   async sv6_save_m(ctx: Context): Promise<Serializable> {

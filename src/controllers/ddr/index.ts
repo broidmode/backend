@@ -27,7 +27,7 @@ export default class extends Combine(User, EacGeneric) {
         item_num: v.s32(1),
         item: {
           item_id: v.str('DDR_TICKET'),
-          not_free_count: v.s32(114514),
+          not_free_count: v.s32(10),
           free_count: v.s32(0),
           buyable_point: v.s32(9999999),
         },
