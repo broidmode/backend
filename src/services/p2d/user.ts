@@ -2,7 +2,7 @@ import { Binary, Db } from "mongodb";
 import { inject, injectable } from "tsyringe";
 import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
 import { Pdata } from "../../types/p2d/pdata.js";
-import { fromKBinXml } from "../../utils/kbinxml.js";
+import { fromKBinXml, toObject } from "../../utils/kbinxml.js";
 
 @injectable()
 export class UserService {
@@ -153,11 +153,11 @@ export class UserService {
     const binary = await this.getPDataBinary(player);
     if (!binary) return undefined;
 
-    return fromKBinXml(binary.pdata).pdata;
+    return toObject(fromKBinXml(binary.pdata)).pdata;
   }
 
   upsertPDataBinary(player: string, pdata: Buffer, check_sum: string) {
-    const unpacked = fromKBinXml(pdata) as { pdata: Pdata };
+    const unpacked = toObject(fromKBinXml(pdata)) as { pdata: Pdata };
     const { djname, infinitas_id } = unpacked.pdata.player;
 
     return this.playDataCol

@@ -2,7 +2,7 @@ import { Logger } from "@cordisjs/logger";
 import { MongoClient } from "mongodb";
 import config from "./utils/config.js";
 import { PlayerPlayData } from "./types/p2d/index.js";
-import { fromKBinXml } from "./utils/kbinxml.js";
+import { fromKBinXml, toObject } from "./utils/kbinxml.js";
 import { Pdata } from "./types/p2d/pdata.js";
 
 interface DatabaseMeta {
@@ -27,7 +27,7 @@ export async function initMongoDb() {
     const cursor = playDataCol.find({});
     const tasks = [];
     for await (const player of cursor) {
-      const { pdata } = fromKBinXml(player.pdata.buffer) as { pdata: Pdata };
+      const { pdata } = toObject(fromKBinXml(player.pdata.buffer)) as { pdata: Pdata };
 
       tasks.push(playDataCol.updateOne({ _id: player._id }, {
         $set: {
