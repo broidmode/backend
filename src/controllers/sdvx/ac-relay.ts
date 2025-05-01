@@ -6,7 +6,6 @@ import { requestEa3 } from "../../utils/ea3.js";
 import { SDVX_AC_MODEL } from "./index.js";
 import { tokenToCardNumber } from '../../utils/laochan-id.js';
 import { cache } from '../../decorators/cache.js';
-import { writeFileSync } from "fs";
 
 export class AcRelay {
   @generic()
