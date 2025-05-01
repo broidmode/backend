@@ -168,6 +168,10 @@ function serializeValue(value: any, type: string): string {
   }
 
   if (['str', 'string'].includes(type)) {
+    if (!value.replace) {
+      return 'null';
+    }
+
     return value.replace(/[<>&'"]/g, (ch: string) => {
       switch (ch) {
         case '<': return '&lt;';
