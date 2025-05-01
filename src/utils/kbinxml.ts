@@ -2,6 +2,7 @@ import { to_bin, to_xml } from "@geekidos/kbinxml";
 import { XMLParser } from "fast-xml-parser";
 import _ from "lodash";
 import { Serializable } from "./kxml-value.js";
+import { writeFileSync } from "fs";
 
 export const parser = new XMLParser({
   ignoreAttributes: false,
@@ -17,6 +18,17 @@ export const parser = new XMLParser({
   },
 });
 
+// TODO: maybe have a better way to workaround this.
+const ALWAYS_BIGINT_FOR_64BIT_NUMBER = false;
+function process64BitInteger(v: string) {
+  const bi = BigInt(v);
+  if (ALWAYS_BIGINT_FOR_64BIT_NUMBER || bi < Number.MIN_SAFE_INTEGER || bi > Number.MAX_SAFE_INTEGER) {
+    return bi;
+  }
+
+  return Number(bi);
+}
+
 function parseValue(node: { $__type: string; $__count?: unknown }): any {
   const isArray = '$__count' in node;
 
@@ -28,8 +40,6 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
       'u16',
       's32',
       'u32',
-      's64',
-      'u64',
     ].includes(node.$__type)
   ) {
     if (isArray) {
@@ -37,6 +47,20 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
     }
 
     return parseInt(node['__value']);
+  }
+
+  // javascript Number can't support 64bit data
+  if (
+    [
+      's64',
+      'u64',
+    ].includes(node.$__type)
+  ) {
+    if (isArray) {
+      return node['__value'].split(' ').map(process64BitInteger);
+    }
+
+    return process64BitInteger(node['__value']);
   }
 
   if (['float', 'double'].includes(node.$__type)) {
@@ -60,7 +84,7 @@ function parseValue(node: { $__type: string; $__count?: unknown }): any {
   }
 
   if (node.$__type == 'time') {
-    return new Date(parseInt(node['__value']) * 1000);
+    return new Date(parseInt(node['__value']));
   }
 
   return {
@@ -159,7 +183,7 @@ function serializeValue(value: any, type: string): string {
 
   if (type == 'time') {
     if (value instanceof Date) {
-      return Math.floor(value.valueOf() / 1000).toString();
+      return Math.floor(value.valueOf()).toString();
     }
 
     if (typeof value === 'number') {
@@ -192,7 +216,7 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
   }
 
   // the kbinxml library had issue when serializing non-ordered stuff
-  attrs.sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
+  // attrs.sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
 
   for (const attr of attrs) {
     if (attr[1] === undefined)
@@ -201,9 +225,9 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
     output += ` ${attr[0]}="${_.escape(attr[1])}"`;
   }
 
-  output += '>';
-
   if (value) {
+    output += '>';
+
     if (value[1] === undefined) {
       return '';
     }
@@ -220,11 +244,11 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
       .join(' ');
   } else {
     const elements = entries
-      .filter(v => !v[0].startsWith('$'))
-      .sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
+      .filter(v => !v[0].startsWith('$'));
+      // .sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
 
     if (elements.length) {
-      output += '\n';
+      output += '>\n';
 
       for (const element of elements) {
         if (element[1] instanceof Array) {
@@ -238,6 +262,8 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
       }
 
       output += linePrefix;
+    } else {
+      return output + ' />\n';
     }
   }
 
@@ -245,11 +271,16 @@ function serializeObject(obj: Serializable, name: string, linePrefix: string = '
 }
 
 export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8', dumpXml: boolean = false) {
-  const xml = `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
+  const xml = `<?xml version="1.0" encoding="${encoding}"?>\n` + serializeObject(obj, topName);
 
   if (dumpXml) {
     console.log(xml);
   }
 
-  return to_bin(xml);
+  const bin = to_bin(xml);
+  if (dumpXml) {
+    writeFileSync('dump.bin', Buffer.from(bin.data));
+  }
+
+  return bin;
 }
