@@ -185,7 +185,7 @@ export class User {
                 for (const seq in m.seqs) {
                   const rec = m.seqs[seq];
                   if (rec.skill > bestScore) {
-                    bestScore = rec.skill;
+                    bestScore = rec.skill % 10000;
                     bestSeq = +seq;
                   }
 
