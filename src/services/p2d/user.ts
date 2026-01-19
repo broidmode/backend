@@ -3,6 +3,8 @@ import { inject, injectable } from "tsyringe";
 import { PlayerPlayData, PlayerMusicData, PlayerPlayLog, PlayerCourseLog, PlayerCustomizeSetting, PlayerRivalData } from "../../types/p2d/index.js";
 import { Pdata } from "../../types/p2d/pdata.js";
 import { fromKBinXml, toObject } from "../../utils/kbinxml.js";
+import { to_bin, to_xml } from "@geekidos/kbinxml";
+import { sha256 } from "../../utils/sha256.js";
 
 @injectable()
 export class UserService {
@@ -143,6 +145,15 @@ export class UserService {
     if (!result)
       return undefined;
 
+    // TODO: implement actual kbinxml encoding/decoding library in js
+    // to avoid hacking like this and in utils/kbinxml/kxml-value.ts
+    let { data } = to_xml(result.pdata.buffer)
+    if (!data.includes("premium_pass")) {
+      data = data.replace("<pdata>", "<pdata><premium_pass __type=\"bool\">1</premium_pass>")
+      result.pdata.buffer = to_bin(data).data;
+      result.check_sum = sha256(Buffer.from(result.pdata.buffer));
+    }
+
     return {
       pdata: Buffer.from(result.pdata.buffer),
       check_sum: result.check_sum,
@@ -153,11 +164,11 @@ export class UserService {
     const binary = await this.getPDataBinary(player);
     if (!binary) return undefined;
 
-    return toObject(fromKBinXml(binary.pdata)).pdata;
+    return toObject(fromKBinXml(binary.pdata as Uint8Array)).pdata;
   }
 
   upsertPDataBinary(player: string, pdata: Buffer, check_sum: string) {
-    const unpacked = toObject(fromKBinXml(pdata)) as { pdata: Pdata };
+    const unpacked = toObject(fromKBinXml(pdata as Uint8Array)) as { pdata: Pdata };
     const { djname, infinitas_id } = unpacked.pdata.player;
 
     return this.playDataCol
@@ -165,7 +176,7 @@ export class UserService {
         $set: {
           djname, infinitas_id,
 
-          pdata: new Binary(pdata),
+          pdata: new Binary(pdata as Uint8Array),
           check_sum,
         }
       }, { upsert: true });

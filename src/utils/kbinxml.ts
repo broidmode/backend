@@ -283,7 +283,7 @@ export function toKBinXml(topName: string, obj: Serializable, encoding: 'UTF-8' 
 
   const bin = to_bin(xml);
   if (dumpXml) {
-    writeFileSync('dump.bin', Buffer.from(bin.data));
+    writeFileSync('dump.bin', Uint8Array.from(bin.data));
   }
 
   return bin;

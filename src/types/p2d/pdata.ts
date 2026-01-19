@@ -1,4 +1,5 @@
 export interface Pdata {
+  premium_pass: boolean;
   bit: Bit;
   dan: Dan;
   effector: Effector;
