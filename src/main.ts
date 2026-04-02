@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import cors from '@koa/cors';
 import Koa, { DefaultState } from 'koa';
 import bodyParser from 'koa-bodyparser';
+import serve from "koa-static";
 import { InjectionToken, Provider, container } from 'tsyringe';
 
 import { ILaochanContext } from './types.js';
@@ -151,7 +152,27 @@ async function main(): Promise<void> {
 
       ctx.logger.info('[server]: status = %d', ctx.status);
     })
-    .use(apiRoutes)
+    .use(async (ctx, next) => {
+      let matchApi = true;
+      await apiRoutes(ctx as any, async () => {
+        matchApi = false;
+      });
+
+      if (matchApi) {
+        ctx.body = JSON.stringify(ctx.body, (_, v) => {
+          if (typeof v === 'bigint') {
+            return v.toString();
+          }
+
+          return v;
+        });
+        ctx.set('Content-Type', 'application/json');
+        return;
+      }
+
+      await next();
+    })
+    .use(serve('static'))
     .use(async (ctx, next) => {
       if (!ctx.body) {
         ctx.body = 'Laochan-Eacnet is running.';
