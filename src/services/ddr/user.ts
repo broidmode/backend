@@ -55,7 +55,7 @@ export class UserService {
     let [playCount, rank, clearKind, score] = data.notes[record.notetype];
 
     playCount++;
-    rank = Math.max(record.rank, rank);
+    rank = playCount === 1 ? record.rank : Math.min(record.rank, rank);
     clearKind = Math.max(record.clearkind, clearKind);
     score = Math.max(record.score, score);
 
