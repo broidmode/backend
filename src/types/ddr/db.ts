@@ -32,6 +32,7 @@ export interface PlayerPlayRecord {
     fast: number;
     slow: number;
     marvelous: number;
+    perfect: number;
     great: number;
     good: number;
     boo: number;
