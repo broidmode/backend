@@ -43,8 +43,10 @@ export class AcRelay {
     const { status, response } = await requestEa3(ctx.acRelayInfo, SDVX_AC_MODEL, ctx.token);
 
     // remove notice from response
-    response['game']['extend']['info'] = response['game']['extend']['info']
-      .filter(v => v['extend_id'].__value !== "1");
+    if (response?.['game']?.['extend']?.['info']) {
+      response['game']['extend']['info'] = response['game']['extend']['info']
+        .filter(v => v['extend_id'].__value !== "1");
+    }
 
     return {
       status: v.s32(0),
